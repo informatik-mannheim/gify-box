@@ -22,3 +22,19 @@ Install the neopixel library from [Adafruit and jgarff](https://github.com/jgarf
 Install viewnior using `sudo apt-get install viewnior`
 
 Start by calling the camera.py as root: `sudo python camera.py`
+
+# Prevent Display Blanking
+
+By default, the display will be turned off after a few moments. You wont notice this when the preview is open, because it overlays the blank screen somehow. But the replay of the gif wont work. So we need to address and fix that. I found two possible solutions which work on different devices. Try one or both of them. [Check the solutions from Foggy and Rasadmin here.](https://www.raspberrypi.org/forums/viewtopic.php?f=66&t=18200)
+
+First solution (by Foggy):
+
+1. Open the kbd config file: `sudo nano /etc/kbd/config`
+2. Change `BLANK_TIME` and `POWERDOWN_TIME` to `0` (zero)
+3. Restart the file using `sudo /etc/init.d/kbd restart` or reboot your RPi
+
+Second solution (by Rasadmin):
+
+1. Open the lightdm config file: `sudo nano /etc/lightdm/lightdm.conf`
+2. Find the header `[SeatDefault]` and insert `xserver-command=X -s 0 dpms` below that header
+3. Reboot your RPi

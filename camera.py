@@ -1,8 +1,7 @@
 #!/usr/bin/env python
-from picamera import PiCamera
 from time import sleep
 from gpiozero import Button
-import os
+import os, random, picamera
 from neopixel import *
 from subprocess import Popen
 
@@ -18,10 +17,15 @@ LED_INVERT     = False   # True to invert the signal (when using NPN transistor 
 
 # Picture configuration
 PICTURE_COUNT   = 5
-SLEEPBETWEEN    = 1 # seconds
-SLEEPAFTER      = 20 # seconds
-ANIMATION_WAIT	= 1000/LED_COUNT	# if we wait that amount after each LED, the whole process takes 1 second
 RESOLUTION 		= (1280, 720)
+
+# Picture wait delays
+INITIAL_WAIT   	= 2 # seconds
+COMPLIMENT_WAIT = 1.5 # seconds
+REPLAY_WAIT     = 20 # seconds
+GOODBYE_WAIT    = 5 # seconds
+STARTING_WAIT	= 4000/LED_COUNT	# if we wait that amount after each LED, the whole process takes 1 second
+PHOTOSHOOT_WAIT	= 2500/LED_COUNT	# time between photos
 
 # How much time between frames in the animated gif
 GIF_DELAY = 25 
@@ -33,9 +37,11 @@ PINLED = 24
 # color values (CAUTION: NOT RGB but GRB: Green, Red, Blue)
 COLOR_OK = Color(255, 0, 0)	#GREEN
 COLOR_BLACK = Color(0, 0, 0) # BLACK
-COLOR_INITCOUNTDOWN1 = Color(255, 0, 0)
-COLOR_INITCOUNTDOWN2 = Color(255, 63, 127)
-COLOR_IMAGECOUNTDOWN = Color(127, 255, 127)
+COLOR_INITCOUNTDOWN1 = Color(150, 0, 0)
+COLOR_INITCOUNTDOWN2 = Color(30, 0, 0)
+COLOR_INITCOUNTDOWN3 = Color(10, 0, 0)
+COLOR_INITCOUNTDOWN4 = Color(5, 0, 0)
+COLOR_IMAGECOUNTDOWN = Color(180, 20, 100)
 COLOR_GIFGENERATION = Color(0, 0, 255)
 COLOR_REPLAY = Color(255, 255, 255)
 
@@ -45,6 +51,24 @@ PATH_OUTPUT = PATH_FILEPATH + 'output/'
 PATH_OUTPUTROUND = PATH_OUTPUT + 'round%06d/'
 PATH_OUTPUTFILE = PATH_OUTPUTROUND + 'frame%02d.jpg'
 PATH_OUTPUTFILEGIF = PATH_OUTPUT + 'round%06d.gif'
+
+# Camera text annotations
+CAMERA_TEXTCOLOR = picamera.Color('white')
+CAMERA_TEXTBACKGROUNDCOLOR = picamera.Color('black')
+
+CAMERA_TEXTVAL_START = 'Get %d poses ready & press the button to start'%PICTURE_COUNT
+CAMERA_TEXTVAL_STARTING1 = 'Photobooth is starting right now'
+CAMERA_TEXTVAL_STARTING2 = 'It will take %d pictures of you'%PICTURE_COUNT
+CAMERA_TEXTVAL_STARTING3 = 'The LED circle will count up for the photo'
+CAMERA_TEXTVAL_STARTING4 = 'Photos are taken each time the LED circle is full'
+CAMERA_TEXTVAL_STARTING5 = 'Get ready! We are launching. Okay, here we go!'
+CAMERA_TEXTVAL_PICINFORMATION = 'Now taking picture #%d'
+CAMERA_TEXTVAL_PROCESSING = 'Stitching your photos together. Please wait a few seconds.'
+CAMERA_TEXTVAL_PROCESSINGDONE = 'We\'re almost done'
+CAMERA_TEXTVAL_GOODBYE = 'It was great having you here! See you around.'
+
+# List of compliments displayed after each photo. Needs atleast as many entries as the picture count!!!
+CAMERA_TEXTVAL_COMPLIMENTS = ['Looking good!', 'That\'s it!', 'Oh yeah!', 'You rock!', 'Just like that!', 'Keep it up!', 'Yes!', 'Now you got it!', 'Oh wow!', 'Daaaaamn!']
 
 ### !! DEFINITIONS DONE !! ###
 
@@ -98,16 +122,33 @@ def rainbow(strip, wait_ms=20, iterations=1):
 ### !! NEO PIXEL ANIMATIONS DONE !! ###
 
 
+### !! CAMERA FUNCTIONS !! ###
+
+def cameraDisplayText(camera, text):
+	if text:
+		camera.annotate_background = CAMERA_TEXTBACKGROUNDCOLOR
+		camera.annotate_text = text
+	else:
+		camera.annotate_background = None
+		camera.annotate_text = ''
+
 
 ### !! BUSINESS LOGIC START !! ###
 
 # start the camera
-camera = PiCamera()
+camera = picamera.PiCamera()
 camera.resolution = RESOLUTION
+
+# turn off that red camera led
+camera.led = False
+
+# set camera annotation text color
+camera.annotate_foreground = CAMERA_TEXTCOLOR
 
 # start the camera preview and show the ok color w/ animation
 camera.start_preview()
 colorWipe(strip, COLOR_OK)
+cameraDisplayText(camera, CAMERA_TEXTVAL_START)
 
 # get the hardware button
 button = Button(PINBTN)
@@ -125,30 +166,48 @@ while True:
 
 	# wait for the button press
 	button.wait_for_press()
+	cameraDisplayText(camera, CAMERA_TEXTVAL_STARTING1)
 
 	# do start animation
-	colorWipe(strip, COLOR_INITCOUNTDOWN1, wait_ms=ANIMATION_WAIT)
-	colorWipe(strip, COLOR_BLACK, wait_ms=ANIMATION_WAIT)
-	colorWipe(strip, COLOR_INITCOUNTDOWN2, wait_ms=ANIMATION_WAIT)
-	colorWipe(strip, COLOR_BLACK, wait_ms=ANIMATION_WAIT)
+	colorWipe(strip, COLOR_INITCOUNTDOWN1, wait_ms=STARTING_WAIT)
+	cameraDisplayText(camera, CAMERA_TEXTVAL_STARTING2)
+	colorWipe(strip, COLOR_INITCOUNTDOWN2, wait_ms=STARTING_WAIT)
+	cameraDisplayText(camera, CAMERA_TEXTVAL_STARTING3)
+	colorWipe(strip, COLOR_INITCOUNTDOWN3, wait_ms=STARTING_WAIT)
+	cameraDisplayText(camera, CAMERA_TEXTVAL_STARTING4)
+	colorWipe(strip, COLOR_INITCOUNTDOWN4, wait_ms=STARTING_WAIT)
+	cameraDisplayText(camera, CAMERA_TEXTVAL_STARTING5)
+	colorWipe(strip, COLOR_BLACK, wait_ms=STARTING_WAIT)
+
+	# sleep a bit
+	sleep(INITIAL_WAIT)
+
+	# get x random unique compliments
+	compliment_shuffle = random.sample(CAMERA_TEXTVAL_COMPLIMENTS, PICTURE_COUNT)
 
 	# frame animate
 	frame = 0
 
 	# loop through the pictures
 	while frame < PICTURE_COUNT:
-		# start light animation
-		colorWipe(strip, COLOR_IMAGECOUNTDOWN, wait_ms=ANIMATION_WAIT*2)
+		# show photo number and start light animation
+		cameraDisplayText(camera, CAMERA_TEXTVAL_PICINFORMATION%(frame+1))
+		colorWipe(strip, COLOR_IMAGECOUNTDOWN, wait_ms=PHOTOSHOOT_WAIT)
 
-		# take a picture
+		# clear the text and take a picture
+		cameraDisplayText(camera, False)
 		camera.capture(PATH_OUTPUTFILE%(mround,frame), use_video_port=True)
 
 		# clear the lights
 		colorClear(strip, COLOR_BLACK)
 
+		# show a compliment and sleep for a bit
+		cameraDisplayText(camera, compliment_shuffle[frame])
+		sleep(COMPLIMENT_WAIT)
 		frame += 1
 
 	# show git generation lights
+	cameraDisplayText(camera, CAMERA_TEXTVAL_PROCESSING)
 	colorWipe(strip, COLOR_GIFGENERATION)
 
 	# create the gif
@@ -159,20 +218,29 @@ while True:
 	command = ["viewnior", "--fullscreen", PATH_OUTPUTFILEGIF%mround]
 	p = Popen(command)
 
+	# display the text telling it is almost done, since we still need time to start the replay
+	cameraDisplayText(camera, CAMERA_TEXTVAL_PROCESSINGDONE)
+
 	# starting the gif viewer takes some time, so dont close the preview right away
 	sleep(2)
 	colorWipe(strip, COLOR_REPLAY)
 	camera.stop_preview()
 
-	sleep(SLEEPAFTER)
+	# wait x seconds while showing the replay
+	sleep(REPLAY_WAIT)
 
-
-	# start the camera preview and show the ok color w/ animation
+	# start the camera preview and close the gif viewer
 	camera.start_preview()
-	colorWipe(strip, COLOR_OK)
-
-	# close the gif viewer
 	p.terminate()
 	p.wait()
+
+	# display the goodbye text
+	cameraDisplayText(camera, CAMERA_TEXTVAL_GOODBYE)
+	sleep(GOODBYE_WAIT)
+
+	# show the ok color w/ animation
+	colorWipe(strip, COLOR_OK)
+	cameraDisplayText(camera, CAMERA_TEXTVAL_START)
+
 
 ### !! BUSINESS LOGIC DONE !! ###
