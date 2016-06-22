@@ -1,6 +1,7 @@
 # photobooth
 RaspberryPi Photobooth software written in Python using [Adafruit Neopixels](https://www.adafruit.com/category/168) and a [Raspberry Pi Camera](https://www.raspberrypi.org/help/camera-module-setup/).
 
+
 # What is this?
 This is a software and hardware implementation for a photobooth, where people can create stop motion gifs. For this people can sit infront of a camera and start the capture process by pressing a hardware button. Then the software takes an predefined amount of pictures and generates a gif. This gif is then played and can be uploaded to an online service. To guide the user, there are also visualizations using a display and Neopixel LEDs.
 
@@ -12,6 +13,12 @@ Next you need some other Hardware:
 * a **[Raspberry Pi camera](https://www.raspberrypi.org/help/camera-module-setup/)**
 * some **hardware buttons and cables**
 * a **[Neopixel ring with 16 pixels or more](https://www.adafruit.com/product/1463)**
+
+# Hardware setup
+
+Connect the hardware from above to the Raspberry Pi. Plug in the display and the input devices. Connect the camera to the port on the RPi. Connect the button and Neopixels according to the Fritzing layout below.
+
+![picture alt](media/sketch.png)
 
 # Installation
 
