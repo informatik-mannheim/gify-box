@@ -7,6 +7,7 @@ from subprocess import Popen
 
 ### !! VAR DEFINITIONS !! ###
 
+
 # LED strip configuration:
 LED_COUNT      = 16      # Number of LED pixels.
 LED_PIN        = 18      # GPIO pin connected to the pixels (must support PWM!).
@@ -15,9 +16,13 @@ LED_DMA        = 5       # DMA channel to use for generating signal (try 5)
 LED_BRIGHTNESS = 50      # Set to 0 for darkest and 255 for brightest
 LED_INVERT     = False   # True to invert the signal (when using NPN transistor l
 
+
+
 # Picture configuration
 PICTURE_COUNT   = 5
 RESOLUTION 		= (1280, 720)
+
+
 
 # Picture wait delays
 INITIAL_WAIT   	= 2 # seconds
@@ -26,15 +31,17 @@ REPLAY_WAIT     = 20 # seconds
 GOODBYE_WAIT    = 5 # seconds
 STARTING_WAIT	= 4000/LED_COUNT	# if we wait that amount after each LED, the whole process takes 1 second
 PHOTOSHOOT_WAIT	= 2500/LED_COUNT	# time between photos
+GIF_DELAY = 25 # How much time (1/100th seconds) between frames in the animated gif
 
-# How much time between frames in the animated gif
-GIF_DELAY = 25 
+
 
 # GPIO pins according to BCM (http://pinout.xyz)
 PINBTN = 23
 PINLED = 24
 
-# color values (CAUTION: NOT RGB but GRB: Green, Red, Blue)
+
+
+# Color values (CAUTION: NOT RGB but GRB: Green, Red, Blue)
 COLOR_OK = Color(255, 0, 0)	#GREEN
 COLOR_BLACK = Color(0, 0, 0) # BLACK
 COLOR_INITCOUNTDOWN1 = Color(150, 0, 0)
@@ -45,12 +52,20 @@ COLOR_IMAGECOUNTDOWN = Color(180, 20, 100)
 COLOR_GIFGENERATION = Color(0, 0, 255)
 COLOR_REPLAY = Color(255, 255, 255)
 
+
+
 # Paths
 PATH_FILEPATH = '/home/pi/photobooth/'
 PATH_OUTPUT = PATH_FILEPATH + 'output/'
 PATH_OUTPUTROUND = PATH_OUTPUT + 'round%06d/'
 PATH_OUTPUTFILE = PATH_OUTPUTROUND + 'frame%02d.jpg'
 PATH_OUTPUTFILEGIF = PATH_OUTPUT + 'round%06d.gif'
+
+# Branding logo overlay
+OVERLAYIMAGE_SRC = PATH_FILEPATH + 'media/logo.png'
+OVERLAYIMAGE_OFFSET = (50, 30)
+
+
 
 # Camera text annotations
 CAMERA_TEXTCOLOR = picamera.Color('white')
@@ -61,14 +76,14 @@ CAMERA_TEXTVAL_STARTING1 = 'Photobooth is starting right now'
 CAMERA_TEXTVAL_STARTING2 = 'It will take %d pictures of you'%PICTURE_COUNT
 CAMERA_TEXTVAL_STARTING3 = 'The LED circle will count up for the photo'
 CAMERA_TEXTVAL_STARTING4 = 'Photos are taken each time the LED circle is full'
-CAMERA_TEXTVAL_STARTING5 = 'Get ready! We are launching. Okay, here we go!'
+CAMERA_TEXTVAL_STARTING5 = 'Get ready! We are launching now.'
 CAMERA_TEXTVAL_PICINFORMATION = 'Now taking picture #%d'
 CAMERA_TEXTVAL_PROCESSING = 'Stitching your photos together. Please wait a few seconds.'
 CAMERA_TEXTVAL_PROCESSINGDONE = 'We\'re almost done'
 CAMERA_TEXTVAL_GOODBYE = 'It was great having you here! See you around.'
 
 # List of compliments displayed after each photo. Needs atleast as many entries as the picture count!!!
-CAMERA_TEXTVAL_COMPLIMENTS = ['Looking good!', 'That\'s it!', 'Oh yeah!', 'You rock!', 'Just like that!', 'Keep it up!', 'Yes!', 'Now you got it!', 'Oh wow!', 'Daaaaamn!']
+CAMERA_TEXTVAL_COMPLIMENTS = ['Looking good!', 'Oh yeah!', 'You rock!', 'Just like that!', 'Keep it up!', 'Yes!', 'Now you got it!', 'Oh wow!', 'Perfect!']
 
 ### !! DEFINITIONS DONE !! ###
 
@@ -127,7 +142,7 @@ def rainbow(strip, wait_ms=20, iterations=1):
 def cameraDisplayText(camera, text):
 	if text:
 		camera.annotate_background = CAMERA_TEXTBACKGROUNDCOLOR
-		camera.annotate_text = text
+		camera.annotate_text = ' '+text+' '
 	else:
 		camera.annotate_background = None
 		camera.annotate_text = ''
@@ -196,7 +211,15 @@ while True:
 
 		# clear the text and take a picture
 		cameraDisplayText(camera, False)
-		camera.capture(PATH_OUTPUTFILE%(mround,frame), use_video_port=True)
+		filepath = PATH_OUTPUTFILE%(mround,frame)
+		camera.capture(filepath, use_video_port=True)
+
+		# add branding and scale down the image using graphicsmagick
+		graphicsmagick  = "gm composite "
+		graphicsmagick += "-gravity SouthEast -geometry +" + str(OVERLAYIMAGE_OFFSET[0]) + "+" + str(OVERLAYIMAGE_OFFSET[0]) + " "	# bottom right with padding
+		graphicsmagick += OVERLAYIMAGE_SRC + " " + filepath + " " + filepath # overlay image, source image, target image
+		print graphicsmagick
+		os.system(graphicsmagick)
 
 		# clear the lights
 		colorClear(strip, COLOR_BLACK)
@@ -242,5 +265,6 @@ while True:
 	colorWipe(strip, COLOR_OK)
 	cameraDisplayText(camera, CAMERA_TEXTVAL_START)
 
+	mround += 1
 
 ### !! BUSINESS LOGIC DONE !! ###
