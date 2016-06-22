@@ -8,13 +8,18 @@ from subprocess import Popen
 ### !! VAR DEFINITIONS !! ###
 
 
-# LED strip configuration:
-LED_COUNT      = 16      # Number of LED pixels.
-LED_PIN        = 18      # GPIO pin connected to the pixels (must support PWM!).
-LED_FREQ_HZ    = 800000  # LED signal frequency in hertz (usually 800khz)
-LED_DMA        = 5       # DMA channel to use for generating signal (try 5)
-LED_BRIGHTNESS = 50      # Set to 0 for darkest and 255 for brightest
-LED_INVERT     = False   # True to invert the signal (when using NPN transistor l
+# LED strip configuration. #1 is at button, #2 at the camera
+LED_COUNT1     	= 24      # Number of LED pixels.
+LED_COUNT2     	= 16      # Number of LED pixels.
+LED_PIN       	= 18      # GPIO pin connected to the button pixels (must support PWM!).
+LED_FREQ_HZ    	= 800000  # LED signal frequency in hertz (usually 800khz)
+LED_DMA        	= 5       # DMA channel to use for generating signal (try 5)
+LED_BRIGHTNESS	= 50      # Set to 0 for darkest and 255 for brightest
+LED_BRIGHTFAC 	= 0.2     # factor of the default brightness
+LED_INVERT     	= False   # True to invert the signal (when using NPN transistor)
+
+# GPIO pins according to BCM (http://pinout.xyz)
+PINBTN = 23
 
 
 
@@ -25,19 +30,12 @@ RESOLUTION 		= (1280, 720)
 
 
 # Picture wait delays
-INITIAL_WAIT   	= 2 # seconds
-COMPLIMENT_WAIT = 1.5 # seconds
-REPLAY_WAIT     = 20 # seconds
-GOODBYE_WAIT    = 5 # seconds
-STARTING_WAIT	= 4000/LED_COUNT	# if we wait that amount after each LED, the whole process takes 1 second
-PHOTOSHOOT_WAIT	= 2500/LED_COUNT	# time between photos
+COMPLIMENT_WAIT = 0.8 # seconds
+REPLAY_WAIT     = 12 # seconds
+GOODBYE_WAIT    = 6 # seconds
+STARTING_WAIT	= 2500/LED_COUNT1	# if we wait that amount after each LED, the whole process takes 1 second
+PHOTOSHOOT_WAIT	= 500/LED_COUNT2	# time between photos
 GIF_DELAY = 25 # How much time (1/100th seconds) between frames in the animated gif
-
-
-
-# GPIO pins according to BCM (http://pinout.xyz)
-PINBTN = 23
-PINLED = 24
 
 
 
@@ -48,8 +46,9 @@ COLOR_INITCOUNTDOWN1 = Color(150, 0, 0)
 COLOR_INITCOUNTDOWN2 = Color(30, 0, 0)
 COLOR_INITCOUNTDOWN3 = Color(10, 0, 0)
 COLOR_INITCOUNTDOWN4 = Color(5, 0, 0)
-COLOR_IMAGECOUNTDOWN = Color(180, 20, 100)
+COLOR_IMAGECOUNTDOWN = Color(35, 15, 105)
 COLOR_GIFGENERATION = Color(0, 0, 255)
+COLOR_GIFGENERATIONDARK = Color(0, 0, 120)
 COLOR_REPLAY = Color(255, 255, 255)
 
 
@@ -72,18 +71,18 @@ CAMERA_TEXTCOLOR = picamera.Color('white')
 CAMERA_TEXTBACKGROUNDCOLOR = picamera.Color('black')
 
 CAMERA_TEXTVAL_START = 'Get %d poses ready & press the button to start'%PICTURE_COUNT
-CAMERA_TEXTVAL_STARTING1 = 'Photobooth is starting right now'
-CAMERA_TEXTVAL_STARTING2 = 'It will take %d pictures of you'%PICTURE_COUNT
-CAMERA_TEXTVAL_STARTING3 = 'The LED circle will count up for the photo'
-CAMERA_TEXTVAL_STARTING4 = 'Photos are taken each time the LED circle is full'
-CAMERA_TEXTVAL_STARTING5 = 'Get ready! We are launching now.'
-CAMERA_TEXTVAL_PICINFORMATION = 'Now taking picture #%d'
+CAMERA_TEXTVAL_STARTING1 = 'Photobooth is starting'
+CAMERA_TEXTVAL_STARTING2 = 'It will take %d pictures'%PICTURE_COUNT
+CAMERA_TEXTVAL_STARTING3 = 'The camera LED circle will fill up'
+CAMERA_TEXTVAL_STARTING4 = 'When it\'s full, a photo is taken'
+CAMERA_TEXTVAL_STARTING5 = 'Get ready! We are launching.'
+CAMERA_TEXTVAL_PICINFORMATION = 'Taking picture #%d'
 CAMERA_TEXTVAL_PROCESSING = 'Stitching your photos together. Please wait a few seconds.'
-CAMERA_TEXTVAL_PROCESSINGDONE = 'We\'re almost done'
+CAMERA_TEXTVAL_PROCESSINGDONE = 'Almost there'
 CAMERA_TEXTVAL_GOODBYE = 'It was great having you here! See you around.'
 
 # List of compliments displayed after each photo. Needs atleast as many entries as the picture count!!!
-CAMERA_TEXTVAL_COMPLIMENTS = ['Looking good!', 'Oh yeah!', 'You rock!', 'Just like that!', 'Keep it up!', 'Yes!', 'Now you got it!', 'Oh wow!', 'Perfect!']
+CAMERA_TEXTVAL_COMPLIMENTS = ['Looking good!', 'Oh yeah!', 'You rock!', 'Just like that!', 'Keep it up!', 'Yes!', 'Great!', 'Oh wow!', 'Perfect!', 'Nice!']
 
 ### !! DEFINITIONS DONE !! ###
 
@@ -91,48 +90,29 @@ CAMERA_TEXTVAL_COMPLIMENTS = ['Looking good!', 'Oh yeah!', 'You rock!', 'Just li
 
 ### !! NEO PIXEL ANIMATIONS - SEE https://github.com/jgarff/rpi_ws281x !! ###
 
-# Create NeoPixel object with appropriate configuration.
-strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
-
-# Intialize the library (must be called once before other functions).
+# Create NeoPixel object with appropriate configuration and intialize the library
+strip = Adafruit_NeoPixel(LED_COUNT1+LED_COUNT2, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
 strip.begin()
 
 
-# Define functions which animate LEDs in various ways.
-def colorClear(strip, color):
-	# show color on all pixels
-	for i in range(strip.numPixels()):
-		strip.setPixelColor(i, color)
-	strip.show()
 
 # Define functions which animate LEDs in various ways.
-def colorWipe(strip, color, wait_ms=20):
+# Asuming the default call is for the button LEDs
+def colorWipe(strip, color, wait_ms=20, isButtonLEDs=True):
+	add = LED_COUNT1 if isButtonLEDs else 0	# offset the leds for the camera leds
+	count = LED_COUNT2 if isButtonLEDs else LED_COUNT1	# offset the leds for the camera leds
+
 	# wipe color: do a radiant animation with this color
-	for i in range(strip.numPixels()):
-		strip.setPixelColor(i, color)
+	for i in range(count):
+		strip.setPixelColor(i+add, color)
 		strip.show()
-		sleep(wait_ms/1000.0)
+		if wait_ms > 0:
+			sleep(wait_ms/1000.0)
 
-def wheel(pos):
-	# get a color for a position
-	if pos < 85:
-		return Color(pos * 3, 255 - pos * 3, 0)
-	elif pos < 170:
-		pos -= 85
-		return Color(255 - pos * 3, 0, pos * 3)
-	else:
-		pos -= 170
-		return Color(0, pos * 3, 255 - pos * 3)
+# Show color instantaneous w/o any animation
+def colorClear(strip, color, isButtonLEDs=True):
+	colorWipe(strip, color, wait_ms=0, isButtonLEDs=isButtonLEDs)
 
-def rainbow(strip, wait_ms=20, iterations=1):
-	# rainbow fade animation
-	for j in range(256*iterations):
-		for i in range(strip.numPixels()):
-			strip.setPixelColor(i, wheel((i+j) & 255))
-		if not animate:
-			return
-		strip.show()
-		sleep(wait_ms/1000.0)
 
 ### !! NEO PIXEL ANIMATIONS DONE !! ###
 
@@ -163,6 +143,7 @@ camera.annotate_foreground = CAMERA_TEXTCOLOR
 # start the camera preview and show the ok color w/ animation
 camera.start_preview()
 colorWipe(strip, COLOR_OK)
+colorClear(strip, COLOR_BLACK, isButtonLEDs=False)
 cameraDisplayText(camera, CAMERA_TEXTVAL_START)
 
 # get the hardware button
@@ -194,9 +175,6 @@ while True:
 	cameraDisplayText(camera, CAMERA_TEXTVAL_STARTING5)
 	colorWipe(strip, COLOR_BLACK, wait_ms=STARTING_WAIT)
 
-	# sleep a bit
-	sleep(INITIAL_WAIT)
-
 	# get x random unique compliments
 	compliment_shuffle = random.sample(CAMERA_TEXTVAL_COMPLIMENTS, PICTURE_COUNT)
 
@@ -207,7 +185,7 @@ while True:
 	while frame < PICTURE_COUNT:
 		# show photo number and start light animation
 		cameraDisplayText(camera, CAMERA_TEXTVAL_PICINFORMATION%(frame+1))
-		colorWipe(strip, COLOR_IMAGECOUNTDOWN, wait_ms=PHOTOSHOOT_WAIT)
+		colorWipe(strip, COLOR_IMAGECOUNTDOWN, wait_ms=PHOTOSHOOT_WAIT, isButtonLEDs=False)
 
 		# clear the text and take a picture
 		cameraDisplayText(camera, False)
@@ -222,16 +200,18 @@ while True:
 		os.system(graphicsmagick)
 
 		# clear the lights
-		colorClear(strip, COLOR_BLACK)
+		colorClear(strip, COLOR_BLACK, isButtonLEDs=False)
 
 		# show a compliment and sleep for a bit
 		cameraDisplayText(camera, compliment_shuffle[frame])
 		sleep(COMPLIMENT_WAIT)
+
 		frame += 1
 
 	# show git generation lights
 	cameraDisplayText(camera, CAMERA_TEXTVAL_PROCESSING)
 	colorWipe(strip, COLOR_GIFGENERATION)
+	colorWipe(strip, COLOR_GIFGENERATIONDARK, isButtonLEDs=False)
 
 	# create the gif
 	graphicsmagick = "gm convert -delay " + str(GIF_DELAY) + " " + PATH_OUTPUTROUND%mround + "*.jpg " + PATH_OUTPUTFILEGIF%mround 
@@ -246,8 +226,9 @@ while True:
 
 	# starting the gif viewer takes some time, so dont close the preview right away
 	sleep(2)
-	colorWipe(strip, COLOR_REPLAY)
+	colorWipe(strip, COLOR_BLACK, isButtonLEDs=False)
 	camera.stop_preview()
+	colorWipe(strip, COLOR_REPLAY)
 
 	# wait x seconds while showing the replay
 	sleep(REPLAY_WAIT)
