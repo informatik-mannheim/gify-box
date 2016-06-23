@@ -55,6 +55,7 @@ COLOR_REPLAY = Color(255, 255, 255)
 
 # Paths
 PATH_FILEPATH = '/home/pi/photobooth/'
+PATH_DATAFILE = PATH_FILEPATH + 'count.txt'
 PATH_OUTPUT = PATH_FILEPATH + 'output/'
 PATH_OUTPUTROUND = PATH_OUTPUT + 'round%06d/'
 PATH_OUTPUTFILE = PATH_OUTPUTROUND + 'frame%02d.jpg'
@@ -71,7 +72,7 @@ CAMERA_TEXTCOLOR = picamera.Color('white')
 CAMERA_TEXTBACKGROUNDCOLOR = picamera.Color('black')
 
 CAMERA_TEXTVAL_START = 'Get %d poses ready & press the button to start'%PICTURE_COUNT
-CAMERA_TEXTVAL_STARTING1 = 'Photobooth is starting'
+CAMERA_TEXTVAL_STARTING1 = 'Photobooth is starting. Session #%06d'
 CAMERA_TEXTVAL_STARTING2 = 'It will take %d pictures'%PICTURE_COUNT
 CAMERA_TEXTVAL_STARTING3 = 'The camera LED circle will fill up'
 CAMERA_TEXTVAL_STARTING4 = 'When it\'s full, a photo is taken'
@@ -149,8 +150,16 @@ cameraDisplayText(camera, CAMERA_TEXTVAL_START)
 # get the hardware button
 button = Button(PINBTN)
 
-# round increment
+# get the data file and read the current round from there so we dont overwrite stuff
 mround = 0
+try:
+        mfile = open(PATH_DATAFILE, 'r')
+        mround = int(mfile.readline())
+        mfile.close()
+except:
+        print "File content error"
+        
+
 
 while True:
 
@@ -162,7 +171,7 @@ while True:
 
 	# wait for the button press
 	button.wait_for_press()
-	cameraDisplayText(camera, CAMERA_TEXTVAL_STARTING1)
+	cameraDisplayText(camera, CAMERA_TEXTVAL_STARTING1%mround)
 
 	# do start animation
 	colorWipe(strip, COLOR_INITCOUNTDOWN1, wait_ms=STARTING_WAIT)
@@ -247,5 +256,8 @@ while True:
 	cameraDisplayText(camera, CAMERA_TEXTVAL_START)
 
 	mround += 1
+
+	# write the current round to the file
+	f = open("count.txt", "w"); f.write(str(mround)); f.close()
 
 ### !! BUSINESS LOGIC DONE !! ###
