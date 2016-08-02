@@ -99,9 +99,9 @@ strip.begin()
 
 # Define functions which animate LEDs in various ways.
 # Asuming the default call is for the button LEDs
-def colorWipe(strip, color, wait_ms=20, isButtonLEDs=True):
-	add = LED_COUNT1 if isButtonLEDs else 0	# offset the leds for the camera leds
-	count = LED_COUNT2 if isButtonLEDs else LED_COUNT1	# offset the leds for the camera leds
+def color_wipe(strip, color, wait_ms=20, is_button_with_leds=True):
+	add = LED_COUNT1 if is_button_with_leds else 0	# offset the leds for the camera leds
+	count = LED_COUNT2 if is_button_with_leds else LED_COUNT1	# offset the leds for the camera leds
 
 	# wipe color: do a radiant animation with this color
 	for i in range(count):
@@ -111,8 +111,8 @@ def colorWipe(strip, color, wait_ms=20, isButtonLEDs=True):
 			sleep(wait_ms/1000.0)
 
 # Show color instantaneous w/o any animation
-def colorClear(strip, color, isButtonLEDs=True):
-	colorWipe(strip, color, wait_ms=0, isButtonLEDs=isButtonLEDs)
+def color_clear(strip, color, is_button_with_leds=True):
+	color_wipe(strip, color, wait_ms=0, is_button_with_leds=is_button_with_leds)
 
 
 ### !! NEO PIXEL ANIMATIONS DONE !! ###
@@ -120,7 +120,7 @@ def colorClear(strip, color, isButtonLEDs=True):
 
 ### !! CAMERA FUNCTIONS !! ###
 
-def cameraDisplayText(camera, text):
+def camera_print_text(camera, text):
 	if text:
 		camera.annotate_background = CAMERA_TEXTBACKGROUNDCOLOR
 		camera.annotate_text = ' '+text+' '
@@ -143,9 +143,9 @@ camera.annotate_foreground = CAMERA_TEXTCOLOR
 
 # start the camera preview and show the ok color w/ animation
 camera.start_preview()
-colorWipe(strip, COLOR_OK)
-colorClear(strip, COLOR_BLACK, isButtonLEDs=False)
-cameraDisplayText(camera, CAMERA_TEXTVAL_START)
+color_wipe(strip, COLOR_OK)
+color_clear(strip, COLOR_BLACK, is_button_with_leds=False)
+camera_print_text(camera, CAMERA_TEXTVAL_START)
 
 # get the hardware button
 button = Button(PINBTN)
@@ -157,7 +157,7 @@ try:
         mround = int(mfile.readline())
         mfile.close()
 except:
-        print "File content error"
+        print("File content error")
         
 
 
@@ -167,22 +167,22 @@ while True:
 	try:
 		os.mkdir(PATH_OUTPUTROUND%mround, 0777)
 	except OSError:
-		print "dir already there"
+		print("dir already there")
 
 	# wait for the button press
 	button.wait_for_press()
-	cameraDisplayText(camera, CAMERA_TEXTVAL_STARTING1%mround)
+	camera_print_text(camera, CAMERA_TEXTVAL_STARTING1%mround)
 
 	# do start animation
-	colorWipe(strip, COLOR_INITCOUNTDOWN1, wait_ms=STARTING_WAIT)
-	cameraDisplayText(camera, CAMERA_TEXTVAL_STARTING2)
-	colorWipe(strip, COLOR_INITCOUNTDOWN2, wait_ms=STARTING_WAIT)
-	cameraDisplayText(camera, CAMERA_TEXTVAL_STARTING3)
-	colorWipe(strip, COLOR_INITCOUNTDOWN3, wait_ms=STARTING_WAIT)
-	cameraDisplayText(camera, CAMERA_TEXTVAL_STARTING4)
-	colorWipe(strip, COLOR_INITCOUNTDOWN4, wait_ms=STARTING_WAIT)
-	cameraDisplayText(camera, CAMERA_TEXTVAL_STARTING5)
-	colorWipe(strip, COLOR_BLACK, wait_ms=STARTING_WAIT)
+	color_wipe(strip, COLOR_INITCOUNTDOWN1, wait_ms=STARTING_WAIT)
+	camera_print_text(camera, CAMERA_TEXTVAL_STARTING2)
+	color_wipe(strip, COLOR_INITCOUNTDOWN2, wait_ms=STARTING_WAIT)
+	camera_print_text(camera, CAMERA_TEXTVAL_STARTING3)
+	color_wipe(strip, COLOR_INITCOUNTDOWN3, wait_ms=STARTING_WAIT)
+	camera_print_text(camera, CAMERA_TEXTVAL_STARTING4)
+	color_wipe(strip, COLOR_INITCOUNTDOWN4, wait_ms=STARTING_WAIT)
+	camera_print_text(camera, CAMERA_TEXTVAL_STARTING5)
+	color_wipe(strip, COLOR_BLACK, wait_ms=STARTING_WAIT)
 
 	# get x random unique compliments
 	compliment_shuffle = random.sample(CAMERA_TEXTVAL_COMPLIMENTS, PICTURE_COUNT)
@@ -193,11 +193,11 @@ while True:
 	# loop through the pictures
 	while frame < PICTURE_COUNT:
 		# show photo number and start light animation
-		cameraDisplayText(camera, CAMERA_TEXTVAL_PICINFORMATION%(frame+1))
-		colorWipe(strip, COLOR_IMAGECOUNTDOWN, wait_ms=PHOTOSHOOT_WAIT, isButtonLEDs=False)
+		camera_print_text(camera, CAMERA_TEXTVAL_PICINFORMATION%(frame+1))
+		color_wipe(strip, COLOR_IMAGECOUNTDOWN, wait_ms=PHOTOSHOOT_WAIT, is_button_with_leds=False)
 
 		# clear the text and take a picture
-		cameraDisplayText(camera, False)
+		camera_print_text(camera, False)
 		filepath = PATH_OUTPUTFILE%(mround,frame)
 		camera.capture(filepath, use_video_port=True)
 
@@ -205,22 +205,21 @@ while True:
 		graphicsmagick  = "gm composite "
 		graphicsmagick += "-gravity SouthEast -geometry +" + str(OVERLAYIMAGE_OFFSET[0]) + "+" + str(OVERLAYIMAGE_OFFSET[0]) + " "	# bottom right with padding
 		graphicsmagick += OVERLAYIMAGE_SRC + " " + filepath + " " + filepath # overlay image, source image, target image
-		print graphicsmagick
 		os.system(graphicsmagick)
 
 		# clear the lights
-		colorClear(strip, COLOR_BLACK, isButtonLEDs=False)
+		color_clear(strip, COLOR_BLACK, is_button_with_leds=False)
 
 		# show a compliment and sleep for a bit
-		cameraDisplayText(camera, compliment_shuffle[frame])
+		camera_print_text(camera, compliment_shuffle[frame])
 		sleep(COMPLIMENT_WAIT)
 
 		frame += 1
 
 	# show git generation lights
-	cameraDisplayText(camera, CAMERA_TEXTVAL_PROCESSING)
-	colorWipe(strip, COLOR_GIFGENERATION)
-	colorWipe(strip, COLOR_GIFGENERATIONDARK, isButtonLEDs=False)
+	camera_print_text(camera, CAMERA_TEXTVAL_PROCESSING)
+	color_wipe(strip, COLOR_GIFGENERATION)
+	color_wipe(strip, COLOR_GIFGENERATIONDARK, is_button_with_leds=False)
 
 	# create the gif
 	graphicsmagick = "gm convert -delay " + str(GIF_DELAY) + " " + PATH_OUTPUTROUND%mround + "*.jpg " + PATH_OUTPUTFILEGIF%mround 
@@ -231,13 +230,13 @@ while True:
 	p = Popen(command)
 
 	# display the text telling it is almost done, since we still need time to start the replay
-	cameraDisplayText(camera, CAMERA_TEXTVAL_PROCESSINGDONE)
+	camera_print_text(camera, CAMERA_TEXTVAL_PROCESSINGDONE)
 
 	# starting the gif viewer takes some time, so dont close the preview right away
 	sleep(2)
-	colorWipe(strip, COLOR_BLACK, isButtonLEDs=False)
+	color_wipe(strip, COLOR_BLACK, is_button_with_leds=False)
 	camera.stop_preview()
-	colorWipe(strip, COLOR_REPLAY)
+	color_wipe(strip, COLOR_REPLAY)
 
 	# wait x seconds while showing the replay
 	sleep(REPLAY_WAIT)
@@ -248,16 +247,18 @@ while True:
 	p.wait()
 
 	# display the goodbye text
-	cameraDisplayText(camera, CAMERA_TEXTVAL_GOODBYE)
+	camera_print_text(camera, CAMERA_TEXTVAL_GOODBYE)
 	sleep(GOODBYE_WAIT)
 
 	# show the ok color w/ animation
-	colorWipe(strip, COLOR_OK)
-	cameraDisplayText(camera, CAMERA_TEXTVAL_START)
+	color_wipe(strip, COLOR_OK)
+	camera_print_text(camera, CAMERA_TEXTVAL_START)
 
 	mround += 1
 
 	# write the current round to the file
-	f = open("count.txt", "w"); f.write(str(mround)); f.close()
+	f = open("count.txt", "w")
+	f.write(str(mround))
+	f.close()
 
 ### !! BUSINESS LOGIC DONE !! ###
