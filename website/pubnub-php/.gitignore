@@ -1,0 +1,12 @@
+**/*.php.temp
+**/*.txt
+**/*.iml
+
+# composer vendor dir
+/vendor
+
+# composer lock file
+/composer.lock
+
+# IDEA files
+/.idea

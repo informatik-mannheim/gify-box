@@ -1,0 +1,34 @@
+{
+    "name": "pubnub/pubnub",
+    "type": "library",
+    "description": "The Only Global Network For Real-Time Data -- PubNub!",
+    "keywords": ["api", "real-time", "realtime", "real time", "ajax", "push"],
+    "homepage": "http://www.pubnub.com/",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Dmitry Medvedev",
+            "email": "gektor1@gmail.com"
+        },
+        {
+            "name": "Victor Kislichenko",
+            "email": "dofer@bigmir.net"
+        },
+        {
+            "name": "PubNub Support",
+            "email": "support@pubnub.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.3.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "3.7.*",
+        "phpdocumentor/phpdocumentor": "dev-master"
+    },
+    "autoload": {
+        "psr-0": {
+            "Pubnub\\": "composer/lib/"
+        }
+    }
+}
