@@ -75,7 +75,7 @@ CAMERA_TEXTVAL_COMPLIMENTS = ['Awesome!', 'Looking good!', 'Oh yeah!', 'You rock
 
 
 # webserver data
-WEBSERVER_URL = ''
+WEBSERVER_URL = 'http://37.61.204.167/photobooth/upload.php'
 
 ### !! DEFINITIONS DONE !! ###
 
@@ -207,9 +207,9 @@ while True:
 	color_wipe(strip, COLOR_UPLOAD)
 
 	# upload pictures to server
-	images = [(x, PATH_OUTPUTFILE%(mround,x), 'image/png') for x in range(PICTURE_COUNT)]
+	images = [('images', ('img%d.png'%x, PATH_OUTPUTFILE%(mround,x), 'image/png')) for x in range(PICTURE_COUNT)]
 	print images
-	r = requests.post(WEBSERVER_URL, files=[('images', tuple(images))])
+	r = requests.post(WEBSERVER_URL, files=images)
 	print r.text
 
 	# sleep some more
