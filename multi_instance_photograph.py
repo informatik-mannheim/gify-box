@@ -55,6 +55,10 @@ PATH_OUTPUT = PATH_FILEPATH + 'output/'
 PATH_OUTPUTROUND = PATH_OUTPUT + 'round%06d/'
 PATH_OUTPUTFILE = PATH_OUTPUTROUND + 'frame%02d.jpg'
 
+# Branding logo overlay
+OVERLAYIMAGE_SRC = PATH_FILEPATH + 'media/logo.png'
+OVERLAYIMAGE_OFFSET = (50, 30)
+
 
 
 # Camera text annotations
@@ -75,7 +79,7 @@ CAMERA_TEXTVAL_COMPLIMENTS = ['Awesome!', 'Looking good!', 'Oh yeah!', 'You rock
 
 
 # webserver data
-WEBSERVER_URL = ''
+WEBSERVER_URL = 'http://37.61.204.167/photobooth/upload.php'
 
 ### !! DEFINITIONS DONE !! ###
 
@@ -193,6 +197,12 @@ while True:
 		filepath = PATH_OUTPUTFILE%(mround,frame)
 		camera.capture(filepath, use_video_port=True)
 
+		# add branding and scale down the image using graphicsmagick
+		graphicsmagick  = "gm composite "
+		graphicsmagick += "-gravity SouthEast -geometry +" + str(OVERLAYIMAGE_OFFSET[0]) + "+" + str(OVERLAYIMAGE_OFFSET[0]) + " "	# bottom right with padding
+		graphicsmagick += OVERLAYIMAGE_SRC + " " + filepath + " " + filepath # overlay image, source image, target image
+		os.system(graphicsmagick)
+
 		# clear the lights
 		color_clear(strip, COLOR_BLACK, is_button_with_leds=False)
 
@@ -207,10 +217,8 @@ while True:
 	color_wipe(strip, COLOR_UPLOAD)
 
 	# upload pictures to server
-	images = [(x, PATH_OUTPUTFILE%(mround,x), 'image/png') for x in range(PICTURE_COUNT)]
-	print images
-	r = requests.post(WEBSERVER_URL, files=[('images', tuple(images))])
-	print r.text
+	images = [('image%d'%x, open(PATH_OUTPUTFILE%(mround,x), 'rb')) for x in range(PICTURE_COUNT)]
+	r = requests.post(WEBSERVER_URL, files = images)
 
 	# sleep some more
 	sleep(GOODBYE_WAIT)
