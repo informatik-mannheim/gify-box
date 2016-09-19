@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from time import sleep
 from gpiozero import Button
-import os, random, picamera
+import os, random, picamera, requests
 from neopixel import *
 from subprocess import Popen
 
@@ -30,10 +30,10 @@ RESOLUTION 		= (1280, 720)
 
 # Picture wait delays
 COMPLIMENT_WAIT = 0.8 # seconds
-REPLAY_WAIT     = 12 # seconds
+REPLAY_WAIT     = 24 # seconds
 GOODBYE_WAIT    = 6 # seconds
 STARTING_WAIT	= 2500/LED_COUNT	# if we wait that amount after each LED, the whole process takes 1 second
-PHOTOSHOOT_WAIT	= 500/LED_COUNT		# time between photos
+PHOTOSHOOT_WAIT	= 360/LED_COUNT		# time between photos
 GIF_DELAY = 25 # How much time (1/100th seconds) between frames in the animated gif
 
 
@@ -83,6 +83,12 @@ CAMERA_TEXTVAL_GOODBYE = 'It was great having you here! See you around.'
 
 # List of compliments displayed after each photo. Needs atleast as many entries as the picture count!!!
 CAMERA_TEXTVAL_COMPLIMENTS = ['Looking good!', 'Oh yeah!', 'You rock!', 'Just like that!', 'Keep it up!', 'Yes!', 'Great!', 'Oh wow!', 'Perfect!', 'Nice!']
+
+
+# webserver data
+WEBSERVER_URL = 'http://gifbox.ux-lab.xyz/upload.php'
+
+
 
 ### !! DEFINITIONS DONE !! ###
 
@@ -217,6 +223,10 @@ while True:
 	# show gif generation lights
 	camera_print_text(camera, CAMERA_TEXTVAL_PROCESSING)
 	color_wipe(strip, COLOR_GIFGENERATION)
+
+	# upload pictures to server
+	images = [('image%d'%x, open(PATH_OUTPUTFILE%(mround,x), 'rb')) for x in range(PICTURE_COUNT)]
+	r = requests.post(WEBSERVER_URL, files = images)
 
 	# create the gif
 	graphicsmagick = "gm convert -delay " + str(GIF_DELAY) + " " + PATH_OUTPUTROUND%mround + "*.jpg " + PATH_OUTPUTFILEGIF%mround 
