@@ -33,6 +33,8 @@ git clone https://github.com/gtRfnkN/photobooth.git
 echo " -- DONE: Cloning project --"
 
 
+echo " -- DONT FORGET TO DISABLED SCREEN BLANKING MANUALLY --"
+echo " -- read and follow installation/screenblanking.txt! --"
 
 echo "=== Finished installation of GIF Box ==="
 
