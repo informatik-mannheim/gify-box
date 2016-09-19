@@ -1,7 +1,7 @@
 #!/usr/bin/env python
 from time import sleep
 from gpiozero import Button
-import os, random, picamera, requests
+import os, random, picamera, requests, serial
 from neopixel import *
 from subprocess import Popen
 
@@ -34,7 +34,7 @@ REPLAY_WAIT     = 24 # seconds
 GOODBYE_WAIT    = 6 # seconds
 STARTING_WAIT	= 500/LED_COUNT	# TODO:2500 if we wait that amount after each LED, the whole process takes 1 second
 PHOTOSHOOT_WAIT	= 360/LED_COUNT		# time between photos
-GIF_DELAY = 25 # How much time (1/100th seconds) between frames in the animated gif
+GIF_DELAY = 35 # How much time (1/100th seconds) between frames in the animated gif
 
 
 
@@ -154,6 +154,9 @@ camera_print_text(camera, CAMERA_TEXTVAL_START)
 # get the hardware button
 button = Button(PINBTN)
 
+# start the serial connection
+ser = serial.Serial(port='/dev/ttyACM0', baudrate=19200)
+
 # get the data file and read the current round from there so we dont overwrite stuff
 mround = 0
 try:
@@ -231,6 +234,7 @@ while True:
 	if r.status_code == 200:
 		filename = r.text
 		print "printing user receipt with URL: %s" % str(r.text)
+		ser.write(r.text)
 
 	# create the gif
 	graphicsmagick = "gm convert -delay " + str(GIF_DELAY) + " " + PATH_OUTPUTROUND%mround + "*.jpg " + PATH_OUTPUTFILEGIF%mround 
