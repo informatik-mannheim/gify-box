@@ -71,10 +71,10 @@ CAMERA_TEXTCOLOR = picamera.Color('white')
 CAMERA_TEXTBACKGROUNDCOLOR = picamera.Color('black')
 
 CAMERA_TEXTVAL_START = 'Get %d poses ready & press the button to start'%PICTURE_COUNT
-CAMERA_TEXTVAL_STARTING1 = 'Photobooth is starting. Session #%06d'
+CAMERA_TEXTVAL_STARTING1 = 'Animated GIF-Box is starting. Session #%06d'
 CAMERA_TEXTVAL_STARTING2 = 'It will take %d pictures'%PICTURE_COUNT
-CAMERA_TEXTVAL_STARTING3 = 'The camera LED circle will fill up'
-CAMERA_TEXTVAL_STARTING4 = 'When it\'s full, a photo is taken'
+CAMERA_TEXTVAL_STARTING3 = 'The LED strip will fill towards the camera'
+CAMERA_TEXTVAL_STARTING4 = 'When it reaches the camera, a photo is taken'
 CAMERA_TEXTVAL_STARTING5 = 'Get ready! We are launching.'
 CAMERA_TEXTVAL_PICINFORMATION = 'Taking picture #%d'
 CAMERA_TEXTVAL_PROCESSING = 'Stitching your photos together. Please wait a few seconds.'
