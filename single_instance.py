@@ -32,7 +32,7 @@ RESOLUTION 		= (1280, 720)
 COMPLIMENT_WAIT = 0.8 # seconds
 REPLAY_WAIT     = 24 # seconds
 GOODBYE_WAIT    = 6 # seconds
-STARTING_WAIT	= 2500/LED_COUNT	# if we wait that amount after each LED, the whole process takes 1 second
+STARTING_WAIT	= 500/LED_COUNT	# TODO:2500 if we wait that amount after each LED, the whole process takes 1 second
 PHOTOSHOOT_WAIT	= 360/LED_COUNT		# time between photos
 GIF_DELAY = 25 # How much time (1/100th seconds) between frames in the animated gif
 
@@ -227,6 +227,10 @@ while True:
 	# upload pictures to server
 	images = [('image%d'%x, open(PATH_OUTPUTFILE%(mround,x), 'rb')) for x in range(PICTURE_COUNT)]
 	r = requests.post(WEBSERVER_URL, files = images)
+	print "upload finished with result code: %s" % str(r.status_code)
+	if r.status_code == 200:
+		filename = r.text
+		print "printing user receipt with URL: %s" % str(r.text)
 
 	# create the gif
 	graphicsmagick = "gm convert -delay " + str(GIF_DELAY) + " " + PATH_OUTPUTROUND%mround + "*.jpg " + PATH_OUTPUTFILEGIF%mround 
