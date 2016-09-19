@@ -34,7 +34,7 @@ echo " -- DONE: Cloning project --"
 
 
 echo " -- DONT FORGET TO DISABLED SCREEN BLANKING MANUALLY --"
-echo " -- read and follow installation/screenblanking.txt! --"
+echo " -- read and follow installation/manual_install.txt! --"
 
 echo "=== Finished installation of GIF Box ==="
 

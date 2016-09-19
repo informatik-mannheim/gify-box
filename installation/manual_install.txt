@@ -8,3 +8,8 @@ sudo nano /etc/xdg/lxsession/LXDE-pi/autostart
 	@xset s noblank 
 	@xset s off 
 	@xset -dpms
+
+
+Add photobooth to auto start:
+sudo crontab -e
+	@reboot sh /home/pi/photobooth/launcher.sh >/home/pi/photobooth/cronlog 2>&1
