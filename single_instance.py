@@ -32,7 +32,7 @@ RESOLUTION 		= (1280, 720)
 COMPLIMENT_WAIT = 0.8 # seconds
 REPLAY_WAIT     = 24 # seconds
 GOODBYE_WAIT    = 6 # seconds
-STARTING_WAIT	= 500/LED_COUNT	# TODO:2500 if we wait that amount after each LED, the whole process takes 1 second
+STARTING_WAIT	= 2500/LED_COUNT	# if we wait that amount after each LED, the whole process takes 1 second
 PHOTOSHOOT_WAIT	= 360/LED_COUNT		# time between photos
 GIF_DELAY = 35 # How much time (1/100th seconds) between frames in the animated gif
 

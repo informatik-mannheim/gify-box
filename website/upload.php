@@ -8,8 +8,8 @@
 	if(!empty($_FILES['image0'])) {
 
 		// get the target dir
-		$rand_dir = date('YmdHis', time()) . '-' . mt_rand();
-		$uploaddir = getcwd() . '/' . $uploadroot . '/' . $rand_dir;
+		$timeId = GetIdTimestring();
+		$uploaddir = getcwd() . '/' . $uploadroot . '/' . $timeId;
 
 		// create dir if not there
 		if (!file_exists($uploaddir)) {
@@ -36,18 +36,31 @@
 		foreach($uploaded_files as $jpg_file) {
 		    $frame = new Imagick($jpg_file);
 		    $animation->addImage($frame);
-		    $animation->setImageDelay(50);
+		    $animation->setImageDelay(35);
 		    $animation->nextImage();
 		}
 
 		// save gif animation
 		$animation->writeImages($uploaddir.'/animation.gif', true);
+	
+		// send data to pubnub
+		$pubnub = new Pubnub('pub-c-d74ad429-a08c-4141-b850-de0497df1020', 'sub-c-69d90c20-798e-11e6-9387-02ee2ddab7fe');
+		$publish_result = $pubnub->publish('gifbox', array('action' => 'reload', 'id' => $timeId));
+
+		// print server URI, the "y" for the detail view route and id for the new gif
+		echo 'http'. (($_SERVER['SERVER_PORT'] == '443') ? 's' : '') .'://'. $_SERVER['SERVER_NAME'] .'/y';
+		echo $timeId;
 	}
 
-	/*
-	$pubnub = new Pubnub('PUBLISH_KEY', 'SUBSCRIBE_KEY');
-	$publish_result = $pubnub->publish('portrait_dev', array('action' => 'reload', 'id' => $id, 'target' => substr($filename,0,2), 'item' => $uploaddir.$filename));
-	*/
+	function GetIdTimestring() {
+		$charstring = "Cz7YMrLNA5h2ktxBKEgsmUD9c3PXS6FRHqpidnbfQaGyT841ZjJue";
+		$datestring = date('y-m-d-H-i-s', time());
 
-	echo "OK";
-?>	
+		$uniqueId = "";
+		foreach (explode("-", $datestring) as $val) {
+			$uniqueId .= $charstring[$val%strlen($charstring)];
+		}
+
+		return $uniqueId;
+	}
+?>
