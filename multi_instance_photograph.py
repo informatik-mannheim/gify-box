@@ -79,7 +79,7 @@ CAMERA_TEXTVAL_COMPLIMENTS = ['Awesome!', 'Looking good!', 'Oh yeah!', 'You rock
 
 
 # webserver data
-WEBSERVER_URL = 'http://37.61.204.167/photobooth/upload.php'
+WEBSERVER_URL = 'http://gifbox.ux-lab.xyz/upload.php'
 
 ### !! DEFINITIONS DONE !! ###
 
