@@ -61,7 +61,7 @@ PATH_OUTPUTFILE = PATH_OUTPUTROUND + 'frame%02d.jpg'
 PATH_OUTPUTFILEGIF = PATH_OUTPUT + 'round%06d.gif'
 
 # Branding logo overlay
-OVERLAYIMAGE_SRC = PATH_FILEPATH + 'media/logo.png'
+OVERLAYIMAGE_SRC = PATH_FILEPATH + 'media/logo_makerfaire.png'
 OVERLAYIMAGE_OFFSET = (50, 30)
 
 
