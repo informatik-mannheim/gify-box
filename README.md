@@ -12,11 +12,11 @@ Next you need some other Hardware:
 * a **display with HDMI** and an HDMI cable connected to the RPi
 * a **[Raspberry Pi camera](https://www.raspberrypi.org/help/camera-module-setup/)**
 * some **hardware buttons and cables**
-* a **[Neopixel ring with 16 pixels or more](https://www.adafruit.com/product/1463)**
+* two **[Neopixel strips with 8 pixels](https://www.adafruit.com/products/1460)** (you can use any other amount or length)
 
 # Hardware setup
 
-Connect the hardware from above to the Raspberry Pi. Plug in the display and the input devices. Connect the camera to the port on the RPi. Connect the button and Neopixels according to the Fritzing layout below.
+Connect the hardware from above to the Raspberry Pi. Plug in the display and the input devices. Connect the camera to the camera port on the RPi. Connect the button and Neopixels according to the Fritzing layout below.
 
 ![picture alt](media/sketch.png)
 
@@ -26,9 +26,9 @@ Get your Raspberry Pi working with Raspbian following [the official tutorials](h
 
 Install the neopixel library from [Adafruit and jgarff](https://github.com/jgarff/rpi_ws281x). There are more [informations and examples here](https://learn.adafruit.com/neopixels-on-raspberry-pi/software).
 
-Install viewnior using `sudo apt-get install viewnior`
+Install other needed software using the installation script in the `installation` folder.
 
-Start by calling the camera.py as root: `sudo python camera.py`
+Start by calling the camera.py as root: `sudo python single_instance.py`
 
 # Prevent Display Blanking
 
