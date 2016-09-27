@@ -7,7 +7,7 @@ This is a software and hardware implementation for a photobooth, where people ca
 
 ![title image](media/in-action.jpg)
 
-Also check the flyer in [english](media/flyer-en.pdf) and [german](media/flyer-de.pdf).
+Also check the flyer in [english](/media/flyer.pdf) and [german](/media/flyer-de.pdf).
 
 # What do you need?
 First of all you need a **Raspberry Pi**. I would recommend a **RPi 3 Rev. B**, since the older version are slower and the gif generations takes longer. Therefore the user experience might is worse. Also you need the mandatory hardware for the Raspberry Pi: an **microUSB power adapter with 5V and atleast 2A** & a **microSD card with atleast 16GB** memory. Also a mouse and keyboard for debugging. And a LAN cable if you dont use Wifi.
