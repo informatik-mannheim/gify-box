@@ -3,8 +3,13 @@ RewriteEngine on
 # Do not remove this line or mod_rewrite rules and search engine friendly URLs will stop working
 RewriteBase /
 
-RewriteRule xg(.*)$ /uploads/$1/animation.gif
+# show detail page
 RewriteRule y(.*)$ /detail.php?file=$1
-RewriteRule z(.*)$ /uploads/$1/animation.mp4
+
+# show image as gif or mp4
+RewriteRule xg(.*)$ /uploads/$1/animation.gif
+RewriteRule xz(.*)$ /uploads/$1/animation.mp4
+
+# trigger download for gif or mp4
 RewriteRule dlg(.*)$ /download.php?file=$1&type=gif
 RewriteRule dlm(.*)$ /download.php?file=$1&type=mp4
