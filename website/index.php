@@ -14,7 +14,7 @@
     <meta name="description" content="">
     <meta name="author" content="">
 
-    <title>Animated GIF-Box</title>
+    <title>GIFy-Box</title>
 
     <!-- Bootstrap core CSS -->
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" integrity="sha384-BVYiiSIFeK1dGmJRAkycuHAHRg32OmUcww7on3RYdg4Va+PmSTsz/K68vbdEjh4u" crossorigin="anonymous">
@@ -62,7 +62,7 @@
     <div class="container">
 
       <div class="page-header">
-        <h1>Animated GIF-Box</h1>
+        <h1>GIFy-Box</h1>
         <h4>All public animations from all events</h4>
       </div>
 

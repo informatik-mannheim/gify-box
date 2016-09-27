@@ -14,7 +14,14 @@
 <html>
 <head>
 	<meta charset="UTF-8">
-	<title>Animated GIF-Box</title>
+	<title>GIFy-Box</title>
+
+	<meta property="og:title" content="GIFy-Box"/>
+	<meta property="og:type" content="gif"/>
+	<meta property="og:url" content="http://gifbox.ux-lab.xyz/y<?=$animation_id?>"/>
+	<meta property="og:image" content="http://gifbox.ux-lab.xyz/xg<?=$animation_id?>"/>
+	<meta property="og:site_name" content="GIFy-Box"/>
+	<meta property="og:description" content="Check out this animation from the GIFy-Box"/>
 
 	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,600" rel="stylesheet">
 	<style type="text/css">
@@ -43,7 +50,7 @@
 			top: 0;
 			left: 0;
 			right: 0;
-			background-color: rgba(0, 0, 0, 0.85);
+			background-color: rgba(0, 0, 0, 0.35);
 			color: #FFFFFF;
 
 			text-align: center;
@@ -55,15 +62,20 @@
 			bottom: 0;
 			left: 0;
 			right: 0;
-			background-color: rgba(0, 0, 0, 0.85);
+			background-color: rgba(0, 0, 0, 0.35);
 			color: #FFFFFF;
 
 			text-align: center;
 			padding: 10px;
 		}
 
-		#share_overlay span {
+		#share_overlay .share {
 			margin-right: 20px;
+		}
+
+		#share_overlay .dimmed {
+			color: #aaa;
+			padding-left: 5px;
 		}
 
 		a, a:visited {
@@ -87,17 +99,17 @@
 	<div id="header_overlay">
 		<a href="/">
 			<small>go back to the</small> &nbsp;&nbsp;
-			Animated GIF-Box
+			GIFy-Box
 		</a>
 	</div>
 
 	<div id="share_overlay">
-		<span>share: </span>
-		<a target="_blank" href="mailto:asd?Subject=Look%20at%20me%20jumping%20around&Body=Check%20out%20my%20GIF%20at%20http%3A//gifbox.ux-lab.xyz/y<?=$animation_id?>">E-Mail</a>
-		<a target="_blank" href="http://www.facebook.com/sharer.php?u=http://gifbox.ux-lab.xyz/y<?=$animation_id?>">Facebook</a>
-		<a target="_blank" href="">Instagram</a>
+		<span class="share">share: </span>
+		<a target="_blank" href="mailto:?Subject=Look%20at%20me%20jumping%20around&Body=Check%20out%20my%20GIF%20at%20http%3A//gifbox.ux-lab.xyz/y<?=$animation_id?>">E-Mail</a>
+		<a target="_blank" href="http://www.facebook.com/sharer.php?u=http://gifbox.ux-lab.xyz/xg<?=$animation_id?>">Facebook</a>
 		<a target="_blank" href="https://twitter.com/share?url=http://gifbox.ux-lab.xyz/y<?=$animation_id?>&amp;text=Look%20at%20my%20GIF&amp;hashtags=animatedgifbox">Twitter</a>
-		<a target="_blank" href="/dlg<?=$animation_id?>">Download GIF</a>
+		<a target="_blank" href="/dlg<?=$animation_id?>">download GIF</a>
+		<a target="_blank" href="/dlm<?=$animation_id?>">download MP4 <span class="dimmed">(Instagram)</span></a>
 	</div>
 </body>
 

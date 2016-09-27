@@ -9,12 +9,13 @@
 	}
 
 	// get the file name
-	$animation_id = $_GET["file"];
 	$animation_type = $_GET["type"];
+	$animation_id = "uploads/".$_GET["file"]."/animation.".$animation_type;
 
 	header('Content-Type: application/octet-stream');
 	header('Content-Disposition: attachment; filename=animation.'.$animation_type);
 	readfile($animation_id);
+
 	exit;
 
 ?>
