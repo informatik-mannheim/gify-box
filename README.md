@@ -41,7 +41,7 @@ You can modify the text by modifying the *CAMERA_TEXTVAL_?* values. You can modi
 
 # Hardware setup
 
-Connect the hardware from above to the Raspberry Pi. Plug in the display and the input devices. Connect the camera to the camera port on the RPi. Connect the button and Neopixels according to the Fritzing layout below.
+Connect the hardware from above to the Raspberry Pi. Plug in the display and the input devices. Connect the camera to the camera port on the RPi. Connect the button and Neopixels according to the Fritzing layout below. Connect the Arduino using an USB cable and connect the printer using a serial connection. The printer must be powered with an external power supply!
 
 ![hardware](media/sketch.png)
 
