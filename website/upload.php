@@ -56,7 +56,7 @@
 	}
 
 	function GetIdTimestring() {
-		$charstring = "Cz7YMrLNA5h2ktxBKEgsmUD9c3PXS6FRHqpidnbfQaGyT841ZjJue";
+		$charstring = "C7rNA5h2ktBKEsU9c3PS6FRHqpinbfQaT841jJue";
 		$datestring = date('y-m-d-H-i-s', time());
 
 		$uniqueId = "";

@@ -13,8 +13,13 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<meta charset="UTF-8">
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- The above 3 meta tags *must* come first in the head; any other head content must come *after* these tags -->
+
 	<title>GIFy-Box</title>
+    <meta name="author" content="UXID">
 
 	<meta property="og:title" content="GIFy-Box"/>
 	<meta property="og:type" content="gif"/>
@@ -31,18 +36,18 @@
 			height: 100%;
 			overflow: hidden;
 			font-family: 'Open Sans', sans-serif;
+		}
+
+		html {
 			background-color: #000;
 		}
 
-		img {
-			width: 100%;
-			height: auto;
-			position: absolute;
-		    top: 0;
-		    bottom: 0;
-		    left: 0;
-		    right: 0;
-		    margin: auto;
+		body {
+			background: url('/xg<?=$animation_id?>') no-repeat center center fixed; 
+			-webkit-background-size: cover;
+			-moz-background-size: cover;
+			-o-background-size: cover;
+			background-size: cover;
 		}
 
 		#header_overlay {
@@ -66,51 +71,56 @@
 			color: #FFFFFF;
 
 			text-align: center;
-			padding: 10px;
+			padding: 7px 0;
 		}
 
-		#share_overlay .share {
-			margin-right: 20px;
+		#share_overlay a {
+			display: inline-block;
 		}
 
-		#share_overlay .dimmed {
-			color: #aaa;
-			padding-left: 5px;
+		#share_overlay img {
+			height: 32px;
 		}
 
 		a, a:visited {
-			padding: 3px 15px;
+			padding: 10px;
 			color: #FFFFFF;
 			text-decoration: none;
-			margin-left: 10px;
 		}
 
 		a:hover, a:active {
-			color: #000000;
-			background-color:rgba(255, 255, 255, 0.7);
+			padding: 10px;
+			color: #FFFFFF;
+			text-decoration: none;
+			background-color: rgba(0, 0, 0, 0.65);
 		}
 		
 	</style>
 </head>
 
 <body>
-	<img src="/xg<?=$animation_id?>" />
 
 	<div id="header_overlay">
 		<a href="/">
-			<small>go back to the</small> &nbsp;&nbsp;
-			GIFy-Box
+			&lt;&lt; &nbsp;  GIFy-Box
 		</a>
 	</div>
 
 	<div id="share_overlay">
-		<span class="share">share: </span>
-		<a target="_blank" href="mailto:?Subject=Look%20at%20me%20jumping%20around&Body=Check%20out%20my%20GIF%20at%20http%3A//gifbox.ux-lab.xyz/y<?=$animation_id?>">E-Mail</a>
-		<a target="_blank" href="http://www.facebook.com/sharer.php?u=http://gifbox.ux-lab.xyz/xg<?=$animation_id?>">Facebook</a>
-		<a target="_blank" href="https://twitter.com/share?url=http://gifbox.ux-lab.xyz/y<?=$animation_id?>&amp;text=Look%20at%20my%20GIF&amp;hashtags=animatedgifbox">Twitter</a>
-		<a target="_blank" href="/dlg<?=$animation_id?>">download GIF</a>
-		<a target="_blank" href="/dlm<?=$animation_id?>">download MP4 <span class="dimmed">(Instagram)</span></a>
+		<a target="_blank" href="http://www.facebook.com/sharer.php?u=http://gifbox.ux-lab.xyz/xg<?=$animation_id?>">
+			<img src="/pics/facebook.png">
+		</a>
+		<a target="_blank" href="https://twitter.com/share?url=http://gifbox.ux-lab.xyz/y<?=$animation_id?>&amp;text=Look%20at%20my%20GIF&amp;hashtags=animatedgifbox">
+			<img src="/pics/twitter.png">
+		</a>
+		<a target="_blank" href="/dlg<?=$animation_id?>">
+			<img src="/pics/gif.png">
+		</a>
+		<a target="_blank" href="/dlm<?=$animation_id?>">
+			<img src="/pics/mp4.png">
+		</a>
 	</div>
+
 </body>
 
 </html>
