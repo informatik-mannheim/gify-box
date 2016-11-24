@@ -128,6 +128,7 @@ def color_clear(strip, color):
 def camera_print_text(camera, text):
 	if text:
 		camera.annotate_background = CAMERA_TEXTBACKGROUNDCOLOR
+        camera.annotate_text_size = 64
 		camera.annotate_text = ' '+text+' '
 	else:
 		camera.annotate_background = None
