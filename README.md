@@ -7,7 +7,7 @@ This is a software and hardware implementation for a photobooth, where people ca
 
 ![title image](media/in-action.jpg)
 
-Also check the flyer in [english](/media/flyer.pdf) and [german](/media/flyer-de.pdf).
+Also check the flyer in [English](/media/flyer.pdf) and [German](/media/flyer-de.pdf).
 
 # What do you need?
 
