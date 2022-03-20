@@ -8,9 +8,12 @@
 		die("No file type!");
 	}
 
-	// get the file name
-	$animation_type = $_GET["type"];
-	$animation_id = "uploads/".$_GET["file"]."/animation.".$animation_type;
+	// sanitize filename and type
+	$file_name      = preg_replace("/[^a-zA-Z0-9_]/", "", $_GET["file"]);
+	$animation_type = preg_replace("/[^a-zA-Z0-9_]/", "", $_GET["type"]);
+
+	// build the file name
+	$animation_id = "uploads/" . $file_name . "/animation." . $animation_type;
 
 	header('Content-Type: application/octet-stream');
 	header('Content-Disposition: attachment; filename=animation.'.$animation_type);
