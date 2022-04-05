@@ -57,28 +57,5 @@
 
     <script src="https://code.jquery.com/jquery-3.1.0.min.js" integrity="sha256-cCueBR6CsyA4/9szpPfrX3s49M9vUU5BgtiJj06wt/s=" crossorigin="anonymous"></script>
     <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js" integrity="sha384-Tc5IQib027qvyjSMfHjOMaLkfuWVxZxUPnCJA7l2mCWNIpG9mGCD8wGNIcPD7Txa" crossorigin="anonymous"></script>
-    <script src="http://cdn.pubnub.com/pubnub-3.16.1.min.js"></script>
-
-    <script type="text/javascript">
-    	var pubnub = PUBNUB.init({
-			subscribe_key: 'sub-c-69d90c20-798e-11e6-9387-02ee2ddab7fe',
-			error: function (error) {
-				console.log('Error:', error);
-			}
-		});
-
-		pubnub.subscribe({
-			channel : 'gifbox',
-			message : function(m){
-				if(m.action == "reload") {
-					$("#preview").attr('src', '/xg'+m.id);
-				}
-			},
-			error : function (error) {
-				// Handle error here
-				console.log(JSON.stringify(error));
-			}
-		});
-    </script>
   </body>
 </html>

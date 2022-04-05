@@ -1,7 +1,4 @@
 <?php
-	require_once("pubnub-php/composer/lib/autoloader.php");
-	use Pubnub\Pubnub;
-
 	// choose folder with the given group ID
 	$uploadroot = 'uploads/';
 
@@ -45,10 +42,6 @@
 
 		// generate MP4
 		exec('convert -antialias -delay 1x5 '.$uploadroot.'/'.$timeId.'/*.jpg '.$uploadroot.'/'.$timeId.'/animation.mp4');
-	
-		// send data to pubnub
-		$pubnub = new Pubnub('pub-c-d74ad429-a08c-4141-b850-de0497df1020', 'sub-c-69d90c20-798e-11e6-9387-02ee2ddab7fe');
-		$publish_result = $pubnub->publish('gifbox', array('action' => 'reload', 'id' => $timeId));
 
 		// print server URI, the "y" for the detail view route and id for the new gif
 		echo 'http'. (($_SERVER['SERVER_PORT'] == '443') ? 's' : '') .'://'. $_SERVER['SERVER_NAME'] .'/y';

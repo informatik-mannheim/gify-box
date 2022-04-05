@@ -86,7 +86,7 @@ CAMERA_TEXTVAL_COMPLIMENTS = ['Looking good!', 'Oh yeah!', 'You rock!', 'Just li
 
 
 # webserver data
-WEBSERVER_URL = 'http://gifyboxdev.ux-lab.xyz/upload.php'
+WEBSERVER_URL = 'http://gifybox.inno-space.de/upload.php'
 
 
 
