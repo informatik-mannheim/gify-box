@@ -15,11 +15,10 @@ Also check the flyer in [english](/media/flyer.pdf) and [german](/media/flyer-de
 First of all you need a **Raspberry Pi**. I would recommend a **RPi 3 Rev. B**, since the older version are slower and the gif generations takes longer. Therefore the user experience might is worse. Also you need the mandatory hardware for the Raspberry Pi: an **microUSB power adapter with 5V and atleast 2A** & a **microSD card with atleast 16GB** memory. Also a mouse and keyboard for debugging. And a LAN cable if you dont use Wifi.
 
 To print the receipts you need:
-* an **Arduino Uno** (or similar). Sadly the RPi 3 does not support direct serial communication with the printer
 * an **[Adafruit Mini Thermal Receipt Printer](https://www.adafruit.com/product/597)**
-* an **USB A-B cable** to connect the Arduino Uno to the RPi (or different USB cable if you use another Arduino board)
+* a **cable** to connect the Thermal Printer to the Raspberry Pi
 
-Next you need some other Hardware: 
+Next you need some other Hardware:
 * a **display with HDMI** and an HDMI cable connected to the RPi. You can use an old **laptop display with LVDS** (most displays use LVDS, but you should make sure, yours does as well) and a **LVDS converter board**
 * a **[Raspberry Pi camera](https://www.raspberrypi.org/help/camera-module-setup/)**
 * some **hardware buttons and cables**
@@ -29,9 +28,9 @@ Also you need an **webserver** for the website supporting PHP and ImageMagick.
 
 ## Modifications
 
-You can also modify the setup to satisfy your needs. 
+You can also modify the setup to satisfy your needs.
 
-You can get rid of the Arduino, a) if you use an older Raspberry Pi Version (like the RPi 2). This will result in slower gif generation. Or b) if you get rid of the printer aswell. In this case you should also get rid of the serial code inside the python script.
+You can get rid of the printer. In this case you should also get rid of the serial code inside the python script.
 
 You can get rid of the webserver and only save the images locally. For this you should remove the requests from the python script.
 
@@ -41,9 +40,9 @@ You can modify the text by modifying the *CAMERA_TEXTVAL_?* values. You can modi
 
 # Hardware setup
 
-Connect the hardware from above to the Raspberry Pi. Plug in the display and the input devices. Connect the camera to the camera port on the RPi. Connect the button and Neopixels according to the Fritzing layout below. Connect the Arduino using an USB cable and connect the printer using a serial connection. The printer must be powered with an external power supply!
+Connect the hardware from above to the Raspberry Pi. Plug in the display and the input devices. Connect the camera to the camera port on the RPi. Connect the button and Neopixels according to the Fritzing layout below. Connect the printer to the RaspberryPI according to the layout. The printer must be powered with an external power supply!
 
-![hardware](media/sketch.png)
+![hardware](media/sketch.svg)
 
 # Installation
 
