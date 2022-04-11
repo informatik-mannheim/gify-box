@@ -204,7 +204,7 @@ class AdafruitThermal:
         Read the internal clock with microsecond precision.
         :return: internal clock value in microseconds
         """
-        return time.clock_gettime_ns(time.CLOCK_REALTIME) / 1000
+        return round(time.time() * 1000000)
 
     def printer_init(self, dtr):
         """
