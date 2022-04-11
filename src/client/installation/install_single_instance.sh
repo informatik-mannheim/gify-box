@@ -16,6 +16,12 @@ sudo apt-get install -y build-essential git python python-rpi.gpio python-dev py
 
 # install python requests
 sudo pip install requests
+sudo pip3 install qrcode[pil]==5.3
+sudo pip3 install imageio
+sudo pip3 install pyserial
+sudo pip3 install PIL
+
+
 echo " -- DONE:  Installing software using apt-get --"
 
 # neopixel installation
