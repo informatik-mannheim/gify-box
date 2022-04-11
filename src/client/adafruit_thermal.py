@@ -39,12 +39,13 @@ of pins but relies on the underlying serial library.
 # pip3 install qrcode[pil]==5.3
 # pip3 install imageio
 # pip3 install pyserial
+# pip3 install PIL
 
 import time
 import serial
 import qrcode
 import math
-
+from PIL import Image
 
 class AdafruitThermal:
     """
@@ -718,6 +719,18 @@ class AdafruitThermal:
                 img_bytes.append(byte)
 
         return img_bytes
+
+    def print_image(self, pil_image):
+        """
+        Prints an PIL image object. This method performs the
+        necessary dithering to send the image to the printer.
+        :param image: the image to print
+        """
+        bw_image = pil_image.convert('1', dither=Image.FLOYDSTEINBERG)
+        width = bw_image.width
+        height = bw_image.height
+        img_bytes = list(bw_image.getdata())
+        self.print_bitmap(width, height, img_bytes)
 
     def print_bitmap(self, w, h, image):
         """

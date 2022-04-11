@@ -54,6 +54,27 @@ Install other needed software using the installation script in the `installation
 
 Start by calling the camera.py as root: `sudo python single_instance.py`
 
+### Raspberry PI 3
+
+If your are using a Raspberry PI 3, the serial interface is not readily available but you need to change some configuration options. The reason is that the UART chip is used by the Bluetooth Chip and therefore you have to disable Bluetooth to gain access to the RS232 port on `/dev/serial0`.
+
+Please add the following lines to the end of the file `/boot/config.txt`:
+
+```console
+dtoverlay=disable-bt
+core_freq=250
+enable_uart=1
+```
+
+Additionally, modify the file `/boot/cmdline.txt` and remove the serial console. If you do not remove it, the Raspberry will open a console on the freshly gained RS232 port and you cannot use it for the printer. After the removal the file looks like this:
+
+```console
+dwc_otg.lpm_enable=0 console=tty1 root=/dev/mmcblk0p2 rootfstype=ext4 elevator=deadline fsck.repair=yes root
+```
+
+Please keep in mind that you should not copy the this line directly into your `cmdline.txt` because it also contains information about the boot device. This may render your Raspberry PI unusable.
+
+
 # Prevent Display Blanking
 
 By default, the display will be turned off after a few moments. You wont notice this when the preview is open, because it overlays the blank screen somehow. But the replay of the gif wont work. So we need to address and fix that. I found two possible solutions which work on different devices. Try one or both of them. [Check the solutions from Foggy and Rasadmin here.](https://www.raspberrypi.org/forums/viewtopic.php?f=66&t=18200)
