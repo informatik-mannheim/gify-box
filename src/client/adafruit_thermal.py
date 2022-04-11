@@ -36,13 +36,14 @@ of pins but relies on the underlying serial library.
 #  See https://github.com/adafruit/Adafruit-Thermal-Printer-Library
 #  for the original code.
 #
-# pip3 install qrcode[pil]
+# pip3 install qrcode[pil]==5.3
 # pip3 install imageio
 # pip3 install pyserial
 
 import time
 import serial
 import qrcode
+import math
 
 
 class AdafruitThermal:
@@ -694,14 +695,41 @@ class AdafruitThermal:
         """
         self.write(self.ASCII_ESC, '-', 0)
 
-    def print_bitmap(self, w, h, bitmap):
+    def _pack_bitmap(self, w, h, image):
         """
-        Print a bitmap image.
+        Packs the given image array into an byte array for the printer
         :param w: width of the image
         :param h: height of the image
-        :param bitmap: the bitmap as an array of
-            grayscale values in the range of 0-255
+        :param img: the bitmap as an array of
+            black and white values (0 or 255
+        :return: the packaged image with eight pixels
+            stored in one single byte.
         """
+        CHUNKS = math.ceil(w / 8)
+        img_bytes = bytearray()
+        for y in range(h):
+            for chunk in range(CHUNKS):
+                start = chunk * 8
+                byte = 0
+                for shift, x in enumerate(range(start, start+8)):
+                    p = image[x + y * w] if x < w else 1
+                    p = int(not p)
+                    byte |= p << (7-shift)
+                img_bytes.append(byte)
+
+        return img_bytes
+
+    def print_bitmap(self, w, h, image):
+        """
+        Print a black and white bitmap image.
+        :param w: width of the image
+        :param h: height of the image
+        :param image: the bitmap as an array of
+            black and white values (0 or 255)
+        """
+
+        bitmap = self._pack_bitmap(w, h, image)
+
         row_bytes = (w + 7) // 8  # Round up to next byte boundary
 
         if row_bytes >= 48:
@@ -919,8 +947,8 @@ class AdafruitThermal:
         """
         qr = qrcode.make(text)
         img = qr.get_image()
-        width = img.width
-        height = img.height
+        width = img.size[0]
+        height = img.size[1]
         raw = list(img.im)
         self.print_bitmap(width, height, raw)
 
