@@ -21,10 +21,10 @@ $ git clone https://github.com/jgarff/rpi_ws281x.git
 $ cd rpi_ws281x/
 $ scons
 $ mkdir build
-$  cd build
-$  cmake -D BUILD_SHARED=OFF -D BUILD_TEST=ON ..
-$  cmake --build .
-$  sudo make install
+$ cd build
+$ cmake -D BUILD_SHARED=OFF -D BUILD_TEST=ON ..
+$ cmake --build .
+$ sudo make install
 ```
 
 ## Install the GifyBox
