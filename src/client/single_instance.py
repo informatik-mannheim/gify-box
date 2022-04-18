@@ -11,7 +11,7 @@ https://github.com/informatik-mannheim/gify-box
 from time import sleep
 from gpiozero import Button
 import os, random, picamera, requests
-from neopixel import *
+from rpi_ws281x import *
 from subprocess import Popen
 import sys, select
 import subprocess
