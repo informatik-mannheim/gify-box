@@ -2,11 +2,7 @@
 
 # We pulled out printing the actual QR code on the
 # thermo printer into a separate file to allow us
-# using Python 3 for this. As the main program is still
-# written in Python 2, starting an external program
-# is the easier approach.
-# As soon as the main program is ported to Python 3,
-# this could be merged into it.
+# using Python 3 for this.
 
 import sys
 import adafruit_thermal as at
