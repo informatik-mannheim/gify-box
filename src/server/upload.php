@@ -1,4 +1,10 @@
 <?php
+
+	// increase time limit for this script to deal
+	// with slow uploads and the encoding time
+	// needed
+	set_time_limit(180);
+
 	// choose folder with the given group ID
 	$uploadroot = 'uploads/';
 
