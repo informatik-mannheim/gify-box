@@ -13,11 +13,11 @@ import adafruit_thermal as at
 from PIL import Image
 
 # Get the text for the QR code from the command line
-LOGO = "logo.png"
+LOGO = "media/logo_bw.png"
 
 def print_qr_code(text):
     # read an image
-    logo = Image.open(LOGO).convert('1', dither=Image.FLOYDSTEINBERG)
+    logo = Image.open(LOGO).convert('1', dither=Image.Dither.FLOYDSTEINBERG)
 
     printer = at.AdafruitThermal()
     printer.begin()

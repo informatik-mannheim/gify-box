@@ -1,5 +1,4 @@
 #!/usr/bin/env python
-
 """
 Main program for the Gify-Box.
 
@@ -8,6 +7,7 @@ This program is currently running with Python 2.
 https://github.com/informatik-mannheim/gify-box
 """
 
+import os
 from time import sleep
 from gpiozero import Button
 import os, random, picamera, requests
@@ -15,6 +15,7 @@ from rpi_ws281x import *
 from subprocess import Popen
 import sys, select
 import subprocess
+import print_qr as at
 
 
 ### !! VAR DEFINITIONS !! ###
@@ -31,23 +32,17 @@ LED_INVERT         = False   # True to invert the signal (when using NPN transis
 # GPIO pins according to BCM (http://pinout.xyz)
 PINBTN = 23
 
-
-
 # Picture configuration
 PICTURE_COUNT   = 5
 RESOLUTION      = (1280, 720)
-
-
 
 # Picture wait delays
 COMPLIMENT_WAIT = 0.8 # seconds
 REPLAY_WAIT     = 24 # seconds
 GOODBYE_WAIT    = 6 # seconds
 STARTING_WAIT   = 1200/LED_COUNT    # if we wait that amount after each LED, the whole process takes 1 second
-PHOTOSHOOT_WAIT = 240/LED_COUNT        # time between photos
+PHOTOSHOOT_WAIT = 360/LED_COUNT        # time between photos
 GIF_DELAY       = 35 # How much time (1/100th seconds) between frames in the animated gif
-
-
 
 # Color values (CAUTION: NOT RGB but GRB: Green, Red, Blue)
 COLOR_OK                = Color(255, 0, 0)    #GREEN
@@ -65,7 +60,7 @@ COLOR_REPLAY            = Color(0, 255, 0)
 
 
 # Paths
-PATH_FILEPATH      = '/home/pi/photobooth/'
+PATH_FILEPATH      = os.path.dirname(os.path.abspath(__file__)) + "/"
 PATH_DATAFILE      = PATH_FILEPATH + 'count.txt'
 PATH_OUTPUT        = PATH_FILEPATH + 'output/'
 PATH_OUTPUTROUND   = PATH_OUTPUT + 'round%06d/'
@@ -73,9 +68,8 @@ PATH_OUTPUTFILE    = PATH_OUTPUTROUND + 'frame%02d.jpg'
 PATH_OUTPUTFILEGIF = PATH_OUTPUT + 'round%06d.gif'
 
 # Branding logo overlay
-OVERLAYIMAGE_SRC    = PATH_FILEPATH + 'media/logo_innospace.png'
+OVERLAYIMAGE_SRC    = PATH_FILEPATH + 'media/logo_color.png'
 OVERLAYIMAGE_OFFSET = (30, 10)
-
 
 
 # Camera text annotations
@@ -263,16 +257,7 @@ while True:
     if r.status_code == 200:
         filename = r.text
         print("printing user receipt with URL: %s" % str(r.text))
-        # Print the QR code using the attached
-        # Adafruit Thermal printer
-        # Due to the fact that the printer driver and the
-        # program to print the QR code are written in
-        # Python 3 but we are currently running under
-        # Python 2, the printing is delegated to an external
-        # process. As soon as we are ported to Python 3
-        # the skript should be imported and simply called
-        # inline
-        subprocess.call(['/home/pi/photobooth/print_qr.py', r.text])
+        at.print_qr_code(r.text)
 
 
     # create the gif
@@ -280,7 +265,6 @@ while True:
     os.system(graphicsmagick) #make the .gif
 
     # start the gif viewer
-    # TODO: This command tends to crash with a "cannot open display"
     command = ["viewnior", "--fullscreen", PATH_OUTPUTFILEGIF%mround]
     p = Popen(command)
 
