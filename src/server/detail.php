@@ -4,9 +4,8 @@
 		die("No file name!");
 	}
 
-	// get the file name
-	$animation_id = $_GET["file"];
-
+	// get the file name and sanitize it
+	$animation_id = preg_replace("/[^a-zA-Z0-9_]/", "", $_GET["file"]);
 
 ?>
 
@@ -43,7 +42,7 @@
 		}
 
 		body {
-			background: url('/xg<?=$animation_id?>') no-repeat center center fixed; 
+			background: url('/xg<?=$animation_id?>') no-repeat center center fixed;
 			-webkit-background-size: cover;
 			-moz-background-size: cover;
 			-o-background-size: cover;
@@ -94,7 +93,7 @@
 			text-decoration: none;
 			background-color: rgba(0, 0, 0, 0.65);
 		}
-		
+
 	</style>
 </head>
 
