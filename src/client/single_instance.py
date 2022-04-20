@@ -94,10 +94,7 @@ CAMERA_TEXTVAL_COMPLIMENTS = ['Looking good!', 'Oh yeah!', 'You rock!', 'Just li
 # webserver data
 WEBSERVER_URL = 'http://gifybox.inno-space.de/upload.php'
 
-
-
 ### !! DEFINITIONS DONE !! ###
-
 
 
 ### !! NEO PIXEL ANIMATIONS - SEE https://github.com/jgarff/rpi_ws281x !! ###
@@ -186,7 +183,6 @@ except:
     print("File content error")
 
 
-
 while True:
 
     # try to create a folder (don't abort if already there)
@@ -258,7 +254,6 @@ while True:
         filename = r.text
         print("printing user receipt with URL: %s" % str(r.text))
         at.print_qr_code(r.text)
-
 
     # create the gif
     graphicsmagick = "gm convert -delay " + str(GIF_DELAY) + " " + PATH_OUTPUTROUND%mround + "*.jpg " + PATH_OUTPUTFILEGIF%mround
