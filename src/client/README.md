@@ -120,16 +120,11 @@ $ ./launcher.sh
 
 # Prevent Display Blanking
 
-By default, the display will be turned off after a few moments. You won't notice this when the preview is open, because it overlays the blank screen somehow. But the replay of the GIF does not work. So we need to address and fix that. I found two possible solutions which work on different devices. Try one or both of them. [Check the solutions from Foggy and Rasadmin here.](https://www.raspberrypi.org/forums/viewtopic.php?f=66&t=18200)
+By default, the display will be turned off after a few moments. You won't notice this when the preview is open, because it overlays the blank screen somehow. But the replay of the GIF does not work. So we need to address and fix that.
 
-First solution (by Foggy):
+Turing of the display blanking is done automatically by the [start script](../../launcher.sh). If you want to do it manually, enter the following two commands into the terminal:
 
-1. Open the kbd config file: `sudo nano /etc/kbd/config`
-2. Change `BLANK_TIME` and `POWERDOWN_TIME` to `0` (zero)
-3. Restart the file using `sudo /etc/init.d/kbd restart` or reboot your RPi
-
-Second solution (by Rasadmin):
-
-1. Open the lightdm config file: `sudo nano /etc/lightdm/lightdm.conf`
-2. Find the header `[SeatDefault]` and insert `xserver-command=X -s 0 dpms` below that header
-3. Reboot your RPi
+```console
+xset s off
+xset -dpms
+```
