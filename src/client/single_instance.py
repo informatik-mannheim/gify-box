@@ -16,7 +16,7 @@ from subprocess import Popen
 import sys, select
 import subprocess
 import print_qr as at
-
+import threading
 
 ### !! VAR DEFINITIONS !! ###
 
@@ -151,6 +151,28 @@ def camera_print_text(camera_to_use, text):
         camera_to_use.annotate_background = None
         camera_to_use.annotate_text = ''
 
+### !! WEBSERVER AND QR CODE !! ###
+def upload_and_print_qr(mround):
+    images = [('image%d'%x, open(PATH_OUTPUTFILE%(mround,x), 'rb')) for x in range(PICTURE_COUNT)]
+    r = requests.post(WEBSERVER_URL, files = images)
+    with open("randomfile.txt","a") as o:
+        o.write(str(r.status_code))
+
+    print("upload finished with result code: %s" % str(r.status_code))
+
+    if r.status_code == 200:
+        filename = r.text
+        print("printing user receipt with URL: %s" % str(r.text))
+        at.print_qr_code(r.text)
+
+def keystroke_watchdog():
+    print("Watchdog startet - waiting for keypress")
+    # Allow quitting by pressing a key
+    while True:
+        a, b, c = select.select( [sys.stdin], [], [], 100)
+        if (a != []):
+           print(a)
+           os._exit(0)
 
 ### !! BUSINESS LOGIC START !! ###
 
@@ -185,7 +207,9 @@ try:
 except:
     print("File content error")
 
-
+# Start the keystroke watchdog thread
+thread_keystroke = threading.Thread(target=keystroke_watchdog, args=())
+thread_keystroke.start()
 
 while True:
 
@@ -246,19 +270,10 @@ while True:
     camera_print_text(camera, CAMERA_TEXTVAL_PROCESSING)
     color_wipe(strip, COLOR_GIFGENERATION)
 
-    # upload pictures to server
-    images = [('image%d'%x, open(PATH_OUTPUTFILE%(mround,x), 'rb')) for x in range(PICTURE_COUNT)]
-    r = requests.post(WEBSERVER_URL, files = images)
-    with open("randomfile.txt","a") as o:
-        o.write(str(r.status_code))
-
-    print("upload finished with result code: %s" % str(r.status_code))
-
-    if r.status_code == 200:
-        filename = r.text
-        print("printing user receipt with URL: %s" % str(r.text))
-        at.print_qr_code(r.text)
-
+    # upload pictures to server in a separated thread
+    # this takes the slow printing of the QR code of our plate
+    upload_thread = threading.Thread(target=upload_and_print_qr, args=(mround,))
+    upload_thread.start()
 
     # create the gif
     graphicsmagick = "gm convert -delay " + str(GIF_DELAY) + " " + PATH_OUTPUTROUND%mround + "*.jpg " + PATH_OUTPUTFILEGIF%mround
@@ -299,9 +314,8 @@ while True:
     f.write(str(mround))
     f.close()
 
-    # Allow quitting by pressing a key
-    #a, b, c = select.select( [sys.stdin], [],[],1)
-    #if (a != []):
-    #   sys.exit(0)
+    # Join upload thread
+    upload_thread.join()
+
 
 ### !! BUSINESS LOGIC DONE !! ###
