@@ -20,6 +20,9 @@ import threading
 
 ### !! VAR DEFINITIONS !! ###
 
+# Web server upload script. Change this to yout server's address
+WEBSERVER_URL = 'http://gifybox.inno-space.de/upload.php'
+
 # LED strip configuration. #1 is at button, #2 at the camera
 LED_COUNT          = 8       # Number of LED pixels.
 LED_PIN            = 18      # GPIO pin connected to the button pixels (must support PWM!).
@@ -37,9 +40,9 @@ PICTURE_COUNT   = 5
 RESOLUTION      = (1280, 720)
 
 # Picture wait delays
-COMPLIMENT_WAIT = 0.8 # seconds
-REPLAY_WAIT     = 24 # seconds
-GOODBYE_WAIT    = 6 # seconds
+COMPLIMENT_WAIT = 0.8  # seconds
+REPLAY_WAIT     = 24   # seconds
+GOODBYE_WAIT    = 6    # seconds
 STARTING_WAIT   = 1200/LED_COUNT    # if we wait that amount after each LED, the whole process takes 1 second
 PHOTOSHOOT_WAIT = 360/LED_COUNT        # time between photos
 GIF_DELAY       = 35 # How much time (1/100th seconds) between frames in the animated gif
@@ -56,9 +59,6 @@ COLOR_GIFGENERATION     = Color(0, 0, 255)
 COLOR_GIFGENERATIONDARK = Color(0, 0, 120)
 COLOR_REPLAY            = Color(0, 255, 0)
 
-
-
-
 # Paths
 PATH_FILEPATH      = os.path.dirname(os.path.abspath(__file__)) + "/"
 PATH_DATAFILE      = PATH_FILEPATH + 'count.txt'
@@ -70,7 +70,6 @@ PATH_OUTPUTFILEGIF = PATH_OUTPUT + 'round%06d.gif'
 # Branding logo overlay
 OVERLAYIMAGE_SRC    = PATH_FILEPATH + 'media/logo_color.png'
 OVERLAYIMAGE_OFFSET = (30, 10)
-
 
 # Camera text annotations
 CAMERA_TEXTCOLOR = picamera.Color('white')
@@ -90,10 +89,6 @@ CAMERA_TEXTVAL_GOODBYE        = 'It was great having you here!'
 # List of compliments displayed after each photo. Needs atleast as many entries as the picture count!!!
 CAMERA_TEXTVAL_COMPLIMENTS = ['Looking good!', 'Oh yeah!', 'You rock!', 'Just like that!', 'Keep it up!', 'Yes!', 'Great!', 'Oh wow!', 'Perfect!', 'Nice!']
 
-
-# webserver data
-WEBSERVER_URL = 'http://gifybox.inno-space.de/upload.php'
-
 ### !! DEFINITIONS DONE !! ###
 
 
@@ -102,7 +97,6 @@ WEBSERVER_URL = 'http://gifybox.inno-space.de/upload.php'
 # Create NeoPixel object with appropriate configuration and intialize the library
 strip = Adafruit_NeoPixel(LED_COUNT, LED_PIN, LED_FREQ_HZ, LED_DMA, LED_INVERT, LED_BRIGHTNESS)
 strip.begin()
-
 
 def color_wipe(strip_to_use, color, wait_ms=20, reverse=False):
     """
@@ -150,6 +144,16 @@ def camera_print_text(camera_to_use, text):
 
 ### !! WEBSERVER AND QR CODE !! ###
 def upload_and_print_qr(mround):
+    """
+    Function to be called in a separate thread. It uploads
+    the pictures to the server and then prints the QR code
+    using the attached printer. We put this together
+    into one funtion because the upload is a prerequesite
+    for the QR code. Therefore, it makes sense to have them
+    together.
+
+    :param mround: round counter - i.e. number of picture taken
+    """
     images = [('image%d'%x, open(PATH_OUTPUTFILE%(mround,x), 'rb')) for x in range(PICTURE_COUNT)]
     r = requests.post(WEBSERVER_URL, files = images)
     with open("randomfile.txt","a") as o:
@@ -163,6 +167,14 @@ def upload_and_print_qr(mround):
         at.print_qr_code(r.text)
 
 def keystroke_watchdog():
+    """
+    Function to be called in a separate thread.
+
+    This functions listens on a keystroke on stdin (due to the
+    stdin buffering a keystroke plus enter) and then terminates
+    the process the hard way. We use it to get out of the
+    user interface of the camera.
+    """
     print("Watchdog startet - waiting for keypress")
     # Allow quitting by pressing a key
     while True:
