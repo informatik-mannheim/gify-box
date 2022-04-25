@@ -5,6 +5,8 @@ a full fledged serial interface. It does not perform handling
 of pins but relies on the underlying serial library.
 """
 
+# Copied here from: https://github.com/thomsmits/adafruit-thermal-printer-python-library
+
 ##
 #  Thermal printer ~C~ Python library for the
 #

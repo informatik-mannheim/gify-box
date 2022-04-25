@@ -94,10 +94,7 @@ CAMERA_TEXTVAL_COMPLIMENTS = ['Looking good!', 'Oh yeah!', 'You rock!', 'Just li
 # webserver data
 WEBSERVER_URL = 'http://gifybox.inno-space.de/upload.php'
 
-
-
 ### !! DEFINITIONS DONE !! ###
-
 
 
 ### !! NEO PIXEL ANIMATIONS - SEE https://github.com/jgarff/rpi_ws281x !! ###
