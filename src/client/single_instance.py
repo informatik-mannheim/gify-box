@@ -2,26 +2,32 @@
 """
 Main program for the Gify-Box.
 
-This program is currently running with Python 2.
-
 https://github.com/informatik-mannheim/gify-box
 """
 
 import os
+import cv2
 from time import sleep
 from gpiozero import Button
-import os, random, picamera, requests
-from rpi_ws281x import *
+import os, random, picamera2, requests
+from picamera2 import Preview
+from rpi_ws281x import Adafruit_NeoPixel, Color
 from subprocess import Popen
 import sys, select
 import subprocess
 import print_qr as at
 import threading
+import numpy as np
+from libcamera import Transform
+
 
 ### !! VAR DEFINITIONS !! ###
 
-# Web server upload script. Change this to yout server's address
-WEBSERVER_URL = 'http://gifybox.inno-space.de/upload.php'
+# Web server upload script. Change this to your server's address
+WEBSERVER_URL = 'https://gify.inno-space.de/upload.php'
+
+PREVIEW_WIDTH = 1920
+PREVIEW_HEIGHT = 1080 # needs to be 4:3 for opencv text to work
 
 # LED strip configuration. #1 is at button, #2 at the camera
 LED_COUNT          = 8       # Number of LED pixels.
@@ -37,7 +43,7 @@ PINBTN = 23
 
 # Picture configuration
 PICTURE_COUNT   = 5
-RESOLUTION      = (1280, 720)
+RESOLUTION      = (1920, 1080) # needs to be 16:9
 
 # Picture wait delays
 COMPLIMENT_WAIT = 0.8  # seconds
@@ -72,10 +78,14 @@ OVERLAYIMAGE_SRC    = PATH_FILEPATH + 'media/logo_color.png'
 OVERLAYIMAGE_OFFSET = (30, 10)
 
 # Camera text annotations
-CAMERA_TEXTCOLOR = picamera.Color('white')
-CAMERA_TEXTBACKGROUNDCOLOR = picamera.Color('black')
+CAMERA_TEXTCOLOR = (255, 255, 255, 255)
+CAMERA_TEXTBACKGROUNDCOLOR = (0, 0, 0, 255)
+CAMERA_TEXTFONT = cv2.FONT_HERSHEY_DUPLEX
+CAMERA_TEXTSCALE = 1
+CAMERA_TEXTTHICKNESS = 2
 
-CAMERA_TEXTVAL_START          = 'Get %d poses ready & press the button'%PICTURE_COUNT
+
+CAMERA_TEXTVAL_START          = 'Press the remote to start'
 CAMERA_TEXTVAL_STARTING1      = 'Taking Gif #%06d'
 CAMERA_TEXTVAL_STARTING2      = 'Let`s go!'
 CAMERA_TEXTVAL_STARTING3      = '3...'
@@ -128,19 +138,23 @@ def color_clear(strip_to_use, color):
 ### !! CAMERA FUNCTIONS !! ###
 
 def camera_print_text(camera_to_use, text):
-    """
-    Show a text on the camera picture.
+    if not text:
+        text = ''
+    overlay = np.zeros((PREVIEW_HEIGHT, PREVIEW_WIDTH, 4), dtype=np.uint8)
+    text_size, _ = cv2.getTextSize(text, CAMERA_TEXTFONT, CAMERA_TEXTSCALE, CAMERA_TEXTTHICKNESS)
+    text_w, text_h = text_size
 
-    :param camera_to_use: the camera to use
-    :param text: the text to diplay
-    """
-    if text:
-        camera_to_use.annotate_background = CAMERA_TEXTBACKGROUNDCOLOR
-        camera_to_use.annotate_text_size = 64
-        camera_to_use.annotate_text = ' ' + text + ' '
-    else:
-        camera_to_use.annotate_background = None
-        camera_to_use.annotate_text = ''
+    padding=10
+    textOriginX = round((PREVIEW_WIDTH - text_w) / 2)
+    textOriginY = 20 + text_h + CAMERA_TEXTSCALE - 1
+    rectangleBoundsTopLeft = ((textOriginX - padding, textOriginY - padding - text_h))
+    rectangleBoundsBottomRight = ((textOriginX + text_w + padding, textOriginY + padding))
+
+
+    cv2.rectangle(overlay, rectangleBoundsTopLeft, rectangleBoundsBottomRight , CAMERA_TEXTBACKGROUNDCOLOR, -1)
+    cv2.putText(overlay, text, (textOriginX, textOriginY), CAMERA_TEXTFONT, CAMERA_TEXTSCALE, CAMERA_TEXTCOLOR, CAMERA_TEXTTHICKNESS)
+    
+    camera_to_use.set_overlay(overlay)
 
 ### !! WEBSERVER AND QR CODE !! ###
 def upload_and_print_qr(mround):
@@ -166,6 +180,9 @@ def upload_and_print_qr(mround):
         print("printing user receipt with URL: %s" % str(r.text))
         at.print_qr_code(r.text)
 
+    if r.status_code == 500:
+        print(str(r.text))
+
 def keystroke_watchdog():
     """
     Function to be called in a separate thread.
@@ -186,26 +203,20 @@ def keystroke_watchdog():
 ### !! BUSINESS LOGIC START !! ###
 
 # start the camera
-camera = picamera.PiCamera()
-camera.resolution = RESOLUTION
-#camera.rotation = 180
+camera = picamera2.Picamera2()
 
-# turn off that red camera led
-camera.led = False
-
-# set camera annotation text color
-camera.annotate_foreground = CAMERA_TEXTCOLOR
+config = camera.create_preview_configuration({"size": RESOLUTION})
+#config = camera.create_preview_configuration()
 
 # start the camera preview and show the ok color w/ animation
-camera.start_preview()
+camera.configure(config)
+camera.start_preview(Preview.QT, x=0, y=0, height=PREVIEW_HEIGHT, width=PREVIEW_WIDTH, transform=Transform(hflip=1))
+camera.start()
 color_wipe(strip, COLOR_OK)
 camera_print_text(camera, CAMERA_TEXTVAL_START)
 
 # get the hardware button
 button = Button(PINBTN)
-
-# start the serial connection
-#ser = serial.Serial(port='/dev/ttyACM0', baudrate=19200)
 
 # get the data file and read the current round from there so we dont overwrite stuff
 mround = 0
@@ -258,7 +269,7 @@ while True:
         # clear the text and take a picture
         camera_print_text(camera, False)
         filepath = PATH_OUTPUTFILE%(mround,frame)
-        camera.capture(filepath, use_video_port=True)
+        camera.capture_file(filepath)
 
         # add branding and scale down the image using graphicsmagick
         graphicsmagick  = "gm composite "
@@ -298,13 +309,14 @@ while True:
     # starting the gif viewer takes some time, so dont close the preview right away
     sleep(2)
     color_wipe(strip, COLOR_REPLAY)
-    camera.stop_preview()
+    #camera.stop_preview()
 
     # wait x seconds while showing the replay
     sleep(REPLAY_WAIT)
 
     # start the camera preview and close the gif viewer
-    camera.start_preview()
+    #camera.start_preview(Preview.QT, x=0, y=0, height=PREVIEW_HEIGHT, width=PREVIEW_WIDTH, transform=Transform(hflip=1))
+    #camera.start()
     p.terminate()
     p.wait()
 
@@ -325,6 +337,5 @@ while True:
 
     # Join upload thread
     upload_thread.join()
-
 
 ### !! BUSINESS LOGIC DONE !! ###

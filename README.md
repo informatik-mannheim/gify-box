@@ -15,7 +15,7 @@ Check the flyer in [english](/media/flyer.pdf) and [german](/media/flyer-de.pdf)
 
 ## Full version
 
-You need a **Raspberry Pi**. We would recommend a **RPi 3 Rev. B**, since the older version are slower and the GIF generation takes longer. Therefore, the user experience might is worse. Also you need the mandatory hardware for the Raspberry Pi: an **microUSB power adapter with 5V and at least 2A** & a **microSD card with at least 16GB** memory. Additionally, a mouse and keyboard for debugging. And a LAN cable if you don't use WIFI.
+You need a **Raspberry Pi**. We would recommend a **RPi 4 Rev. B**, since the older version are slower and the GIF generation takes longer. Therefore, the user experience might is worse. Also you need the mandatory hardware for the Raspberry Pi: an **USB-C power adapter with 5V and at least 2A** & a **microSD card with at least 16GB** memory. Additionally, a mouse and keyboard for debugging. And a LAN cable if you don't use WIFI.
 
 To print the receipts you need:
 

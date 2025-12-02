@@ -29,7 +29,7 @@ def print_qr_code(text):
     printer.println("Gify Box")
     printer.println()
     printer.set_size('S')
-    printer.println("Download your picture here:")
+    printer.println("Download your GIF here:")
     printer.print_qr_code(text)
     printer.println(text)
     printer.println()

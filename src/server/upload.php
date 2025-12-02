@@ -6,7 +6,7 @@
 	set_time_limit(180);
 
 	// choose folder with the given group ID
-	$uploadroot = 'uploads/';
+	$uploadroot = 'uploads';
 
 	if(!empty($_FILES['image0'])) {
 
@@ -31,24 +31,10 @@
 			$uploaded_files[] = $filename;
 		}
 
-		// create gif
-		$animation = new Imagick();
-		$animation->setFormat("GIF");
-
-		// frames
-		foreach($uploaded_files as $jpg_file) {
-		    $frame = new Imagick($jpg_file);
-		    $animation->addImage($frame);
-		    $animation->setImageDelay(35);
-		    $animation->nextImage();
-		}
-
-		// save gif animation
-		$animation->writeImages($uploaddir.'/animation.gif', true);
 
 		// generate MP4
-		exec('convert -antialias -delay 1x5 '.$uploadroot.'/'.$timeId.'/*.jpg '.$uploadroot.'/'.$timeId.'/animation.mp4');
-
+		exec('ffmpeg -framerate 3 -i '.$uploadroot.'/'.$timeId.'/frame%02d.jpg -c:v libx264 -r 30 -pix_fmt yuv420p '.$uploadroot.'/'.$timeId.'/animation.mp4');
+		exec('ffmpeg -framerate 3 -i '.$uploadroot.'/'.$timeId.'/frame%02d.jpg -c:v gif '.$uploadroot.'/'.$timeId.'/animation.gif');
 		// print server URI, the "y" for the detail view route and id for the new gif
 		echo 'http'. (($_SERVER['SERVER_PORT'] == '443') ? 's' : '') .'://'. $_SERVER['SERVER_NAME'] .'/y';
 		echo $timeId;
